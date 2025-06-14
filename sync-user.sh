@@ -39,6 +39,7 @@ if ! command -v stow &> /dev/null; then
 fi
 
 log "Starting user configuration sync for machine: $HOSTNAME"
+log "Dotfiles repository: $DOTFILES_DIR"
 log "Target directory: $HOME"
 cd "$DOTFILES_DIR"
 

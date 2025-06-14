@@ -11,32 +11,33 @@ curl -fsSL https://raw.githubusercontent.com/sevos/arch-dotfiles/main/bootstrap.
 ```
 
 This will:
-- Install git and stow if not already present
-- Clone this repository to `/root/dotfiles`
+- Install git and stow if not already present (using sudo if needed)
+- Clone this repository to `~/.dotfiles`
 - Detect your machine hostname (tuxedo/peon)
+- Allow you to edit your dotfiles directly in your home directory
 
 ## Manual Installation
 
 If you prefer to install manually:
 
 ```bash
-# Install dependencies
-pacman -S git stow
+# Install dependencies (as root or with sudo)
+sudo pacman -S git stow
 
-# Clone the repository
-git clone https://github.com/sevos/arch-dotfiles.git /root/dotfiles
+# Clone the repository to your home directory
+git clone https://github.com/sevos/arch-dotfiles.git ~/.dotfiles
 
 # Navigate to the dotfiles directory
-cd /root/dotfiles
+cd ~/.dotfiles
 ```
 
 ## Structure
 
 ```
-/root/dotfiles/
+~/.dotfiles/
 ├── bootstrap.sh              # Bootstrap installation script
-├── sync-system.sh           # System configuration sync (run as root)
-├── sync-user.sh             # User configuration sync (run as user)
+├── sync-system.sh           # System configuration sync (uses sudo as needed)
+├── sync-user.sh             # User configuration sync
 ├── packages-common/         # Common package lists
 │   ├── pacman.txt          # Official packages
 │   └── aur.txt             # AUR packages
@@ -56,26 +57,39 @@ cd /root/dotfiles
 
 After bootstrap, configure your system:
 
-### System Configuration (as root)
+### System Configuration
 ```bash
-cd /root/dotfiles
+cd ~/.dotfiles
 ./sync-system.sh
 ```
 
 This will:
-- Install packages from common and machine-specific lists
-- Stow system configurations to `/`
-- Run post-install scripts
+- Install packages from common and machine-specific lists (using sudo)
+- Stow system configurations to `/` (using sudo)
+- Run system post-install scripts (using sudo)
 
-### User Configuration (as regular user)
+### User Configuration
 ```bash
-cd /root/dotfiles
+cd ~/.dotfiles
 ./sync-user.sh
 ```
 
 This will:
 - Stow user configurations to `~`
 - Run user post-install scripts
+
+## Editing Your Dotfiles
+
+With the new user-centric approach, you can now easily edit your dotfiles:
+
+```bash
+cd ~/.dotfiles
+# Edit any configuration files directly
+vim user-common/.config/nvim/init.lua
+# Commit your changes
+git add .
+git commit -m "Update neovim config"
+```
 
 ## Machine Support
 
