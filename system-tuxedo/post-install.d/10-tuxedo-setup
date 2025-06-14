@@ -1,0 +1,34 @@
+#!/bin/bash
+# Tuxedo laptop post-install configuration
+
+set -euo pipefail
+
+echo "Configuring Tuxedo laptop settings..."
+
+# Update GRUB configuration if GRUB is installed
+# if command -v grub-mkconfig >/dev/null 2>&1; then
+#     echo "Updating GRUB configuration..."
+#     grub-mkconfig -o /boot/grub/grub.cfg
+# fi
+
+# # Load tuxedo modules if drivers are installed
+# if modinfo tuxedo_keyboard >/dev/null 2>&1; then
+#     echo "Loading Tuxedo kernel modules..."
+#     modprobe tuxedo_io 2>/dev/null || true
+#     modprobe tuxedo_keyboard 2>/dev/null || true
+    
+#     # Verify modules loaded
+#     if lsmod | grep -q tuxedo; then
+#         echo "Tuxedo modules loaded successfully"
+#     else
+#         echo "Warning: Tuxedo modules failed to load. Check if linux headers are installed."
+#     fi
+# fi
+
+# Enable and start tuxedo services if they exist
+if systemctl list-unit-files | grep -q tuxedo; then
+    echo "Enabling Tuxedo services..."
+    systemctl enable --now tuxedo-control-center 2>/dev/null || true
+fi
+
+echo "Tuxedo laptop configuration completed"
