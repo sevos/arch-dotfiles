@@ -1,30 +1,44 @@
 # Arch Linux Dotfiles Project
 
-This repository contains configuration files and settings for Arch Linux systems.
+GNU Stow-based dotfiles management for Arch Linux systems with multi-machine support.
 
-## Project Structure
+## Architecture
 
-- `bootstrap.sh` - Bootstrap script for one-liner installation
-- `README.md` - Project documentation and usage instructions
-- Configuration files and dotfiles will be added as the project grows
+### Core Components
+- **GNU Stow**: Symlink farm manager for configuration files
+- **Machine Detection**: Hostname-based configuration (tuxedo/peon)
+- **Package Management**: Separate pacman and AUR package lists
+- **Post-Install Scripts**: Idempotent configuration scripts
+
+### Directory Structure
+- `packages-{common,hostname}/` - Package lists (pacman.txt, aur.txt)
+- `system-{common,hostname}/` - System configs (stow to `/`)
+- `user-{common,hostname}/` - User configs (stow to `~`)
+- `post-install.d/` - Executable scripts run after stowing
+
+## Scripts
+
+### bootstrap.sh
+- Installs git and stow dependencies
+- Detects hostname for machine-specific configs
+- Clones repository to `/root/dotfiles`
+- Root privilege validation
+
+### sync-system.sh (run as root)
+- Installs packages from common + machine-specific lists
+- Stows system configurations to `/`
+- Executes system post-install scripts
+
+### sync-user.sh (run as regular user)
+- Stows user configurations to `~`
+- Executes user post-install scripts
+- User privilege validation (prevents root execution)
 
 ## Development Guidelines
 
-- All shell scripts should be executable and include proper error handling
-- Use consistent formatting and follow shell scripting best practices
-- Test bootstrap script on clean Arch Linux installations
-- Keep configuration files organized by application/service
-
-## Installation Target
-
-- Target directory: `/root/dotfiles`
-- Requires root access for installation
-- Designed specifically for Arch Linux systems
-
-## Bootstrap Script Features
-
-- Checks for root privileges
-- Validates Arch Linux environment
-- Installs git if not present
-- Clones repository to target directory
-- Provides clear feedback and next steps
+- Keep directory structure minimal and functional
+- Use .keep files for empty directories
+- All scripts include proper error handling and logging
+- Post-install scripts must be idempotent
+- Package lists: one package per line, comments allowed
+- Test on clean Arch installations before deployment

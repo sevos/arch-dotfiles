@@ -42,6 +42,19 @@ else
     log "Git is already installed"
 fi
 
+# Install stow if not present
+if ! command -v stow &> /dev/null; then
+    log "Stow not found. Installing stow..."
+    pacman -S --noconfirm stow
+    log "Stow installed successfully"
+else
+    log "Stow is already installed"
+fi
+
+# Detect hostname
+HOSTNAME=$(hostname)
+log "Detected hostname: $HOSTNAME"
+
 # Remove existing directory if it exists
 if [[ -d "$INSTALL_DIR" ]]; then
     log "Removing existing dotfiles directory..."
@@ -57,8 +70,9 @@ cd "$INSTALL_DIR"
 
 log "${BOLD}Bootstrap completed successfully!${NC}"
 log "Dotfiles are now available in: $INSTALL_DIR"
+log "Detected machine: $HOSTNAME"
 log ""
 log "Next steps:"
-log "  1. Review the configuration files"
-log "  2. Run any setup scripts as needed"
-log "  3. Customize settings to your preferences"
+log "  1. Run './sync-system.sh' as root to install packages and system configs"
+log "  2. Run './sync-user.sh' as regular user to install user configs"
+log "  3. Review and customize configurations as needed"

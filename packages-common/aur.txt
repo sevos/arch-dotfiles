@@ -1,0 +1,2 @@
+# Common AUR packages
+# Add one package per line

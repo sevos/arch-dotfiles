@@ -1,0 +1,2 @@
+# Tuxedo-specific pacman packages
+# Add one package per line

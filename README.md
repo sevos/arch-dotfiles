@@ -11,17 +11,17 @@ curl -fsSL https://raw.githubusercontent.com/sevos/arch-dotfiles/main/bootstrap.
 ```
 
 This will:
-- Install git if not already present
+- Install git and stow if not already present
 - Clone this repository to `/root/dotfiles`
-- Set up the basic structure for your dotfiles
+- Detect your machine hostname (tuxedo/peon)
 
 ## Manual Installation
 
 If you prefer to install manually:
 
 ```bash
-# Install git if needed
-sudo pacman -S git
+# Install dependencies
+pacman -S git stow
 
 # Clone the repository
 git clone https://github.com/sevos/arch-dotfiles.git /root/dotfiles
@@ -34,17 +34,56 @@ cd /root/dotfiles
 
 ```
 /root/dotfiles/
-├── bootstrap.sh    # Bootstrap installation script
-├── CLAUDE.md       # AI assistant instructions
-└── README.md       # This file
+├── bootstrap.sh              # Bootstrap installation script
+├── sync-system.sh           # System configuration sync (run as root)
+├── sync-user.sh             # User configuration sync (run as user)
+├── packages-common/         # Common package lists
+│   ├── pacman.txt          # Official packages
+│   └── aur.txt             # AUR packages
+├── packages-{hostname}/     # Machine-specific packages
+├── system-common/           # Common system configs (stow to /)
+│   ├── etc/                # System configuration files
+│   └── post-install.d/     # Post-install scripts
+├── system-{hostname}/       # Machine-specific system configs
+├── user-common/             # Common user configs (stow to ~)
+│   ├── .config/            # User configuration files
+│   └── post-install.d/     # Post-install scripts
+├── user-{hostname}/         # Machine-specific user configs
+└── README.md               # This file
 ```
 
 ## Usage
 
-After installation, you can:
-1. Review and customize the configuration files
-2. Create symlinks to your home directory as needed
-3. Add your own configuration files to this repository
+After bootstrap, configure your system:
+
+### System Configuration (as root)
+```bash
+cd /root/dotfiles
+./sync-system.sh
+```
+
+This will:
+- Install packages from common and machine-specific lists
+- Stow system configurations to `/`
+- Run post-install scripts
+
+### User Configuration (as regular user)
+```bash
+cd /root/dotfiles
+./sync-user.sh
+```
+
+This will:
+- Stow user configurations to `~`
+- Run user post-install scripts
+
+## Machine Support
+
+Currently supports:
+- `tuxedo` - Machine-specific configurations
+- `peon` - Machine-specific configurations
+
+Common configurations are applied to all machines.
 
 ## Contributing
 
