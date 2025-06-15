@@ -100,6 +100,8 @@ cd "$DOTFILES_DIR"
 log "Updating pacman database..."
 run_as_root pacman -Syu --noconfirm || error "Failed to update system"
 
+# Install all packages first to avoid conflicts with stowed files
+
 # Install packages from common list
 if [[ -f "packages-common/pacman.txt" && -s "packages-common/pacman.txt" ]]; then
     log "Installing common packages from pacman..."
@@ -130,6 +132,8 @@ if command -v yay &> /dev/null; then
 else
     warn "yay not found. Skipping AUR package installation."
 fi
+
+# Now stow configurations after all packages are installed
 
 # Clean orphaned symlinks before stowing
 if [[ $EUID -eq 0 ]]; then
