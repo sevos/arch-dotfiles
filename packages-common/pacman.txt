@@ -4,6 +4,7 @@ gtk4
 libadwaita
 mesa
 vulkan-radeon
+ttf-cascadia-code-nerd
 cage
 niri
 fuzzel

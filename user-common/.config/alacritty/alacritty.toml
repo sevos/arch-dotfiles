@@ -1,0 +1,53 @@
+import = ["themes/tokyo_night.toml"]
+
+[env]
+TERM = "xterm-256color"
+
+[bell]
+animation = "Ease"
+duration = 200
+color = "#7aa2f7"
+
+[cursor.style]
+shape = "Beam"
+
+[font]
+size = 18.0
+
+[font.normal]
+family = "CaskaydiaCove Nerd Font Mono"
+style = "Light"
+
+[font.bold]
+family = "CaskaydiaCove Nerd Font Mono"
+style = "Bold"
+
+[font.italic]
+family = "CaskaydiaCove Nerd Font Mono"
+style = "Italic"
+
+[font.bold_italic]
+family = "CaskaydiaCove Nerd Font Mono"
+style = "Bold Italic"
+
+[window.dimensions]
+columns = 80
+lines = 30
+
+[window.padding]
+x = 10
+y = 10
+
+[scrolling]
+multiplier = 5
+
+[selection]
+save_to_clipboard = true
+
+[mouse]
+hide_when_typing = false
+
+[keyboard]
+bindings = [
+  { key = "N", mods = "Control|Shift", action = "CreateNewWindow" },
+]
