@@ -46,6 +46,41 @@ install_package() {
     fi
 }
 
+# Function to install yay AUR helper
+install_yay() {
+    if command -v yay &> /dev/null; then
+        log "yay is already installed"
+        return 0
+    fi
+    
+    log "Installing yay AUR helper..."
+    
+    # Create temporary directory for building
+    local temp_dir=$(mktemp -d)
+    local original_dir=$(pwd)
+    
+    # Clone yay repository
+    log "Cloning yay from AUR..."
+    if ! git clone https://aur.archlinux.org/yay.git "$temp_dir/yay"; then
+        error "Failed to clone yay repository"
+    fi
+    
+    # Build and install yay
+    cd "$temp_dir/yay"
+    log "Building yay package..."
+    if makepkg -si --noconfirm; then
+        log "yay installed successfully"
+    else
+        cd "$original_dir"
+        rm -rf "$temp_dir"
+        error "Failed to build and install yay"
+    fi
+    
+    # Cleanup
+    cd "$original_dir"
+    rm -rf "$temp_dir"
+}
+
 # Install git if not present
 if ! command -v git &> /dev/null; then
     log "Git not found. Installing git..."
@@ -63,6 +98,18 @@ if ! command -v stow &> /dev/null; then
 else
     log "Stow is already installed"
 fi
+
+# Install base-devel group (required for building AUR packages)
+if ! pacman -Qg base-devel &> /dev/null; then
+    log "Installing base-devel group..."
+    install_package base-devel
+    log "base-devel installed successfully"
+else
+    log "base-devel is already installed"
+fi
+
+# Install yay AUR helper
+install_yay
 
 # Detect hostname
 if [[ -r /etc/hostname ]]; then
