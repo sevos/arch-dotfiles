@@ -128,7 +128,19 @@ else
 fi
 
 # Clean orphaned symlinks before stowing
-run_as_root cleanup_orphaned_dotfiles_links "/" "$DOTFILES_DIR"
+if [[ $EUID -eq 0 ]]; then
+    # Running as root, call function directly
+    cleanup_orphaned_dotfiles_links "/" "$DOTFILES_DIR"
+else
+    # Running as user, need to use sudo but export the function and variables
+    sudo bash -c "
+        GREEN='$GREEN'
+        YELLOW='$YELLOW'
+        NC='$NC'
+        $(declare -f cleanup_orphaned_dotfiles_links log warn)
+        cleanup_orphaned_dotfiles_links '/' '$DOTFILES_DIR'
+    "
+fi
 
 # Stow common system configurations
 if [[ -d "system-common" ]]; then
