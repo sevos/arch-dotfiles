@@ -27,3 +27,8 @@ nitrogen
 mise
 procps-ng
 starship
+bat
+less
+fzf
+zoxide
+lazygit

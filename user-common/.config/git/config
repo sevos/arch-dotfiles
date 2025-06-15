@@ -1,0 +1,67 @@
+[include]
+  path = user
+
+[alias]
+  # Basic shortcuts
+  co = checkout
+  st = status
+  br = branch
+  ci = commit
+  
+  # Enhanced shortcuts  
+  aa = add --all
+  cm = commit -m
+  ca = commit -am
+  ps = push
+  pl = pull
+  df = diff
+  dc = diff --cached
+  
+  # Log shortcuts
+  lg = log --oneline --graph --decorate
+  lga = log --oneline --graph --decorate --all
+  last = log -1 HEAD
+  
+  # Branch management
+  sw = switch
+  sc = switch -c
+  bd = branch -d
+  bdf = branch -D
+  
+  # Reset shortcuts
+  unstage = reset HEAD --
+  undo = reset --soft HEAD~1
+  
+  # Stash shortcuts
+  ss = stash save
+  sp = stash pop
+  sl = stash list
+  
+  # Remote shortcuts
+  rb = rebase
+  rbi = rebase -i
+  
+[core]
+  autocrlf = input
+  excludesfile = ~/.config/git/ignore
+  editor = nano
+
+[init]
+  defaultBranch = main
+
+[pull]
+  rebase = false
+
+[credential "https://github.com"]
+  helper = 
+  helper = !gh auth git-credential
+
+[push]
+  default = simple
+  autoSetupRemote = true
+
+[merge]
+  tool = vimdiff
+
+[diff]
+  tool = vimdiff
