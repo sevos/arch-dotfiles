@@ -1,5 +1,4 @@
-liburing-git
-google-chrome
+google-chrome-stable
 1password
 watchman
 slack-desktop
