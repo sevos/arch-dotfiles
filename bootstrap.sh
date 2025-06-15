@@ -74,15 +74,23 @@ else
 fi
 log "Detected hostname: $HOSTNAME"
 
-# Remove existing directory if it exists
+# Check if repository exists and update or clone
 if [[ -d "$INSTALL_DIR" ]]; then
-    log "Removing existing dotfiles directory..."
-    rm -rf "$INSTALL_DIR"
+    if [[ -d "$INSTALL_DIR/.git" ]]; then
+        log "Existing repository found. Pulling latest changes..."
+        cd "$INSTALL_DIR"
+        git fetch origin
+        git reset --hard origin/main
+        log "Repository updated to latest version"
+    else
+        log "Directory exists but is not a git repository. Removing and cloning fresh..."
+        rm -rf "$INSTALL_DIR"
+        git clone "$REPO_URL" "$INSTALL_DIR"
+    fi
+else
+    log "Cloning dotfiles repository to $INSTALL_DIR..."
+    git clone "$REPO_URL" "$INSTALL_DIR"
 fi
-
-# Clone the repository
-log "Cloning dotfiles repository to $INSTALL_DIR..."
-git clone "$REPO_URL" "$INSTALL_DIR"
 
 # Change to the dotfiles directory
 cd "$INSTALL_DIR"
