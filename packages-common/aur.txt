@@ -1,0 +1,4 @@
+google-chrome
+1password
+watchman
+slack-desktop

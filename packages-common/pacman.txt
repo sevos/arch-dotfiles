@@ -22,3 +22,6 @@ wireplumber
 pipewire
 pipewire-pulse
 wl-clipboard
+nitrogen
+mise
+procps-ng
