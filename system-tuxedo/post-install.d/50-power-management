@@ -40,17 +40,17 @@ systemctl daemon-reload
 # Restart systemd-logind to apply new power settings
 systemctl restart systemd-logind
 
-# Reload udev rules for lid handler
-udevadm control --reload-rules
-udevadm trigger
-
-# Enable lid handler service
-systemctl enable lid-handler.service
-
 echo "Power management configured:"
 echo "  - Power button: suspend"
 echo "  - Lid close on battery: suspend" 
 echo "  - Lid close on AC: stay awake"
 echo "  - Sleep mode: deep (S3)"
+
+echo "Running power management diagnostics..."
+if [[ -x "/usr/local/bin/tuxedo-power-diag.sh" ]]; then
+    /usr/local/bin/tuxedo-power-diag.sh
+else
+    echo "Warning: Diagnostic script not found at /usr/local/bin/tuxedo-power-diag.sh"
+fi
 
 echo "Tuxedo power management configuration completed"
