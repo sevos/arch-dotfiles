@@ -2,6 +2,7 @@ greetd
 greetd-regreet
 gtk4
 libadwaita
+liburing
 mesa
 vulkan-radeon
 cage
