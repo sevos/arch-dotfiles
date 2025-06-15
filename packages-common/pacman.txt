@@ -1,2 +1,0 @@
-# Common pacman packages
-# Add one package per line

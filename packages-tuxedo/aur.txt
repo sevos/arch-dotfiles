@@ -1,8 +1,2 @@
-# Tuxedo-specific AUR packages
-# Add one package per line
-
-# Tuxedo drivers for keyboard backlight and function keys
 tuxedo-drivers-dkms
-
-# Tuxedo Control Center for performance and fan control
 tuxedo-control-center-bin

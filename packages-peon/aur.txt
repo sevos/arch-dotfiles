@@ -1,2 +1,0 @@
-# Peon-specific AUR packages
-# Add one package per line
