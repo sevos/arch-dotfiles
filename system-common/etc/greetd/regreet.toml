@@ -1,0 +1,25 @@
+# ReGreet Configuration
+
+[background]
+# Path to background image
+path = "/usr/share/backgrounds/archlinux/archlinux.jpg"
+# How to fit the background image
+fit = "Cover" # Possible values: Fill, Contain, Cover, ScaleDown
+
+[GTK]
+# Application theme
+application_prefer_dark_theme = true
+# Cursor theme
+cursor_theme_name = "Adwaita"
+# Font
+font_name = "Cantarell 11"
+# Icon theme  
+icon_theme_name = "Adwaita"
+# GTK theme
+theme_name = "Adwaita-dark"
+
+[commands]
+# Command to run on successful authentication
+# This is passed to the session as-is
+reboot = ["systemctl", "reboot"]
+poweroff = ["systemctl", "poweroff"]

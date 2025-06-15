@@ -1,0 +1,15 @@
+#!/bin/bash
+# Niri session wrapper script
+
+# Source user profile for environment variables
+if [ -f "$HOME/.profile" ]; then
+    . "$HOME/.profile"
+fi
+
+# Set XDG session type
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=niri
+export XDG_CURRENT_DESKTOP=niri
+
+# Start niri
+exec niri
