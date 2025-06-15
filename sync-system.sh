@@ -96,6 +96,10 @@ cleanup_orphaned_dotfiles_links() {
 log "Starting system configuration sync for machine: $HOSTNAME"
 cd "$DOTFILES_DIR"
 
+# Update pacman database first
+log "Updating pacman database..."
+run_as_root pacman -Syu --noconfirm || error "Failed to update system"
+
 # Install packages from common list
 if [[ -f "packages-common/pacman.txt" && -s "packages-common/pacman.txt" ]]; then
     log "Installing common packages from pacman..."

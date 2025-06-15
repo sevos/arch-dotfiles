@@ -28,6 +28,18 @@ fi
 
 log "Starting Arch Linux dotfiles bootstrap..."
 
+# Update pacman database first
+log "Updating pacman database..."
+if [[ $EUID -eq 0 ]]; then
+    pacman -Syu --noconfirm || error "Failed to update system"
+else
+    if command -v sudo &> /dev/null; then
+        sudo pacman -Syu --noconfirm || error "Failed to update system"
+    else
+        error "sudo not available and not running as root. Cannot update system"
+    fi
+fi
+
 # Function to install packages with appropriate privileges
 install_package() {
     local package="$1"
