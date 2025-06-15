@@ -1,2 +1,3 @@
 google-chrome
-watchman
+1password
+slack-desktop-wayland
