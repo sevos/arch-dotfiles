@@ -122,12 +122,26 @@ fi
 if command -v yay &> /dev/null; then
     if [[ -f "packages-common/aur.txt" && -s "packages-common/aur.txt" ]]; then
         log "Installing common AUR packages..."
-        yay -S --needed --noconfirm - < packages-common/aur.txt || warn "Some common AUR packages failed to install"
+        # Filter out empty lines and comments, then install
+        local packages=$(grep -v '^#' packages-common/aur.txt | grep -v '^$' | tr '\n' ' ')
+        if [[ -n "$packages" ]]; then
+            log "AUR packages to install: $packages"
+            if ! yay -S --needed --noconfirm $packages; then
+                error "Failed to install common AUR packages: $packages"
+            fi
+        fi
     fi
     
     if [[ -f "packages-$HOSTNAME/aur.txt" && -s "packages-$HOSTNAME/aur.txt" ]]; then
         log "Installing $HOSTNAME-specific AUR packages..."
-        yay -S --needed --noconfirm - < "packages-$HOSTNAME/aur.txt" || warn "Some $HOSTNAME-specific AUR packages failed to install"
+        # Filter out empty lines and comments, then install
+        local packages=$(grep -v '^#' "packages-$HOSTNAME/aur.txt" | grep -v '^$' | tr '\n' ' ')
+        if [[ -n "$packages" ]]; then
+            log "AUR packages to install: $packages"
+            if ! yay -S --needed --noconfirm $packages; then
+                error "Failed to install $HOSTNAME-specific AUR packages: $packages"
+            fi
+        fi
     fi
 else
     warn "yay not found. Skipping AUR package installation."
