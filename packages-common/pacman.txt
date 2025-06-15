@@ -4,7 +4,6 @@ gtk4
 libadwaita
 mesa
 vulkan-radeon
-lib32-mesa
 cage
 niri
 fuzzel
