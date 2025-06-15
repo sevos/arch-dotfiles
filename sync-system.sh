@@ -123,7 +123,7 @@ if command -v yay &> /dev/null; then
     if [[ -f "packages-common/aur.txt" && -s "packages-common/aur.txt" ]]; then
         log "Installing common AUR packages..."
         # Filter out empty lines and comments, then install
-        local packages=$(grep -v '^#' packages-common/aur.txt | grep -v '^$' | tr '\n' ' ')
+        packages=$(grep -v '^#' packages-common/aur.txt | grep -v '^$' | tr '\n' ' ')
         if [[ -n "$packages" ]]; then
             log "AUR packages to install: $packages"
             if ! yay -S --needed --noconfirm $packages; then
@@ -135,7 +135,7 @@ if command -v yay &> /dev/null; then
     if [[ -f "packages-$HOSTNAME/aur.txt" && -s "packages-$HOSTNAME/aur.txt" ]]; then
         log "Installing $HOSTNAME-specific AUR packages..."
         # Filter out empty lines and comments, then install
-        local packages=$(grep -v '^#' "packages-$HOSTNAME/aur.txt" | grep -v '^$' | tr '\n' ' ')
+        packages=$(grep -v '^#' "packages-$HOSTNAME/aur.txt" | grep -v '^$' | tr '\n' ' ')
         if [[ -n "$packages" ]]; then
             log "AUR packages to install: $packages"
             if ! yay -S --needed --noconfirm $packages; then
