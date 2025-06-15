@@ -72,3 +72,4 @@ GNU Stow-based dotfiles management for Arch Linux systems with multi-machine sup
 - Package lists: one package per line, comments allowed
 - Test on clean Arch installations before deployment
 - Follow Arch Linux best practices and wiki recommendations
+- Never add comments to aur.txt or pacman.txt

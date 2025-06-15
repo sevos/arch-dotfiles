@@ -1,9 +1,6 @@
-# Display manager and compositor
 greetd
 greetd-regreet
 niri
-
-# Niri essential tools
 fuzzel
 mako
 waybar
@@ -11,16 +8,10 @@ alacritty
 swaybg
 swaylock
 swayidle
-
-# X11 compatibility
 xwayland-satellite
-
-# Desktop integration
 xdg-desktop-portal-gtk
 gnome-keyring
 polkit-gnome
-
-# Additional utilities
 brightnessctl
 wireplumber
 pipewire
