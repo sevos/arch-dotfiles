@@ -97,7 +97,7 @@ fi
 # Stow common system configurations
 if [[ -d "system-common" ]]; then
     log "Stowing common system configurations..."
-    run_as_root stow -t / system-common || error "Failed to stow common system configurations"
+    run_as_root stow -t / --ignore='post-install.d' system-common || error "Failed to stow common system configurations"
 else
     warn "system-common directory not found"
 fi
@@ -105,7 +105,7 @@ fi
 # Stow machine-specific system configurations
 if [[ -d "system-$HOSTNAME" ]]; then
     log "Stowing $HOSTNAME-specific system configurations..."
-    run_as_root stow -t / "system-$HOSTNAME" || error "Failed to stow $HOSTNAME-specific system configurations"
+    run_as_root stow -t / --ignore='post-install.d' "system-$HOSTNAME" || error "Failed to stow $HOSTNAME-specific system configurations"
 else
     warn "system-$HOSTNAME directory not found"
 fi

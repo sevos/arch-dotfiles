@@ -52,7 +52,7 @@ cd "$DOTFILES_DIR"
 # Stow common user configurations
 if [[ -d "user-common" ]]; then
     log "Stowing common user configurations..."
-    stow -t "$HOME" user-common || error "Failed to stow common user configurations"
+    stow -t "$HOME" --ignore='post-install.d' user-common || error "Failed to stow common user configurations"
 else
     warn "user-common directory not found"
 fi
@@ -60,7 +60,7 @@ fi
 # Stow machine-specific user configurations
 if [[ -d "user-$HOSTNAME" ]]; then
     log "Stowing $HOSTNAME-specific user configurations..."
-    stow -t "$HOME" "user-$HOSTNAME" || error "Failed to stow $HOSTNAME-specific user configurations"
+    stow -t "$HOME" --ignore='post-install.d' "user-$HOSTNAME" || error "Failed to stow $HOSTNAME-specific user configurations"
 else
     warn "user-$HOSTNAME directory not found"
 fi
