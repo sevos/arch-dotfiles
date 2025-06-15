@@ -361,10 +361,11 @@ window-rule {
     default-column-width { proportion 0.75; }
 }
 
-// Alacritty: Set default width to 55%
+// Alacritty: Set default width to 55% and 80% opacity
 window-rule {
     match app-id="Alacritty"
     default-column-width { proportion 0.55; }
+    opacity 0.8
 }
 
 // Slack: Set default width to 55%
