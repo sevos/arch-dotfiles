@@ -1,9 +1,9 @@
 #!/bin/bash
-# Tuxedo laptop post-install configuration
+# Tuxedo laptop power management configuration
 
 set -euo pipefail
 
-echo "Configuring Tuxedo laptop settings..."
+echo "Configuring Tuxedo power management..."
 
 # Update GRUB configuration if GRUB is installed
 # if command -v grub-mkconfig >/dev/null 2>&1; then
@@ -31,4 +31,26 @@ if systemctl list-unit-files | grep -q tuxedo; then
     systemctl enable --now tuxedo-control-center 2>/dev/null || true
 fi
 
-echo "Tuxedo laptop configuration completed"
+# Configure power management
+echo "Configuring Tuxedo power management..."
+
+# Reload systemd configuration for new logind settings
+systemctl daemon-reload
+
+# Restart systemd-logind to apply new power settings
+systemctl restart systemd-logind
+
+# Reload udev rules for lid handler
+udevadm control --reload-rules
+udevadm trigger
+
+# Enable lid handler service
+systemctl enable lid-handler.service
+
+echo "Power management configured:"
+echo "  - Power button: suspend"
+echo "  - Lid close on battery: suspend" 
+echo "  - Lid close on AC: stay awake"
+echo "  - Sleep mode: deep (S3)"
+
+echo "Tuxedo power management configuration completed"

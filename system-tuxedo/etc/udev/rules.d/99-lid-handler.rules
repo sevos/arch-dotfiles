@@ -1,0 +1,4 @@
+# Tuxedo laptop lid event handler
+# Trigger custom lid handler script on lid close/open events
+ACTION=="change", SUBSYSTEM=="power_supply", ENV{POWER_SUPPLY_NAME}=="AC*", RUN+="/usr/bin/systemctl --no-block start lid-handler.service"
+SUBSYSTEM=="button", KERNEL=="event*", ATTRS{name}=="Lid Switch", ACTION=="change", RUN+="/usr/bin/systemctl --no-block start lid-handler.service"
