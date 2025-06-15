@@ -6,14 +6,13 @@ if [ -f "$HOME/.profile" ]; then
     . "$HOME/.profile"
 fi
 
+# Unset DISPLAY to prevent niri from trying to connect to X11
+unset DISPLAY
+
 # Set XDG session type
 export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=niri
 export XDG_CURRENT_DESKTOP=niri
-
-# Set DISPLAY fallback for X11/XWayland compatibility
-# xwayland-satellite will update this when it starts
-export DISPLAY=${DISPLAY:-:0}
 
 # Start niri
 exec niri

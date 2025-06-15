@@ -267,14 +267,14 @@ spawn-at-startup "bash" "-c" "niri msg action focus-workspace 2 && slack --enabl
 // Start Claude Desktop at startup
 spawn-at-startup "bash" "-c" "eval \"$(mise activate bash)\" && exec /home/sevos/AppImages/claude.appimage"
 
-// Start xwayland-satellite for X11 app compatibility (auto-choose display)
-spawn-at-startup "xwayland-satellite"
+// Start xwayland-satellite for X11 app compatibility and set DISPLAY
+spawn-at-startup "bash" "-c" "xwayland-satellite & sleep 0.5 && export DISPLAY=:0"
 
 // Start Alacritty terminal at startup
 spawn-at-startup "alacritty"
 
 // Start Google Chrome at startup (after xwayland-satellite for X11 fallback)
-spawn-at-startup "bash" "-c" "sleep 1 && exec google-chrome-stable --profile-directory='Default' $CHROME_FLAGS"
+spawn-at-startup "bash" "-c" "sleep 2 && DISPLAY=:0 exec google-chrome-stable --profile-directory='Default' $CHROME_FLAGS"
 
 // Start polkit authentication agent for password prompts
 spawn-at-startup "/usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1"
