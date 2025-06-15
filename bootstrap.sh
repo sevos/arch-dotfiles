@@ -154,6 +154,12 @@ fi
 # Change to the dotfiles directory
 cd "$INSTALL_DIR"
 
+# Set user home directory permissions for symlink traversal
+# 711 permits execute (traversal) without read access to directory contents
+# This is needed for stowed system files to be accessible by other users (like greeter)
+log "Setting home directory permissions for symlink traversal..."
+chmod 711 "$HOME"
+
 log "${BOLD}Bootstrap completed successfully!${NC}"
 log "Dotfiles are now available in: $INSTALL_DIR"
 log "Detected machine: $HOSTNAME"
