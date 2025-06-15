@@ -1,3 +1,4 @@
+liburing-git
 google-chrome
 1password
 watchman
