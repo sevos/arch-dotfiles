@@ -1,3 +1,4 @@
+[general]
 import = ["themes/tokyo_night.toml"]
 
 [env]
