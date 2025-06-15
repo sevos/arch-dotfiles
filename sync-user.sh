@@ -85,6 +85,12 @@ cd "$DOTFILES_DIR"
 # Clean orphaned symlinks before stowing
 cleanup_orphaned_dotfiles_links "$HOME" "$DOTFILES_DIR"
 
+# Remove existing bashrc to prevent stow conflicts
+if [[ -f "$HOME/.bashrc" ]]; then
+    log "Removing existing .bashrc to prevent stow conflicts"
+    rm "$HOME/.bashrc"
+fi
+
 # Stow common user configurations
 if [[ -d "user-common" ]]; then
     log "Stowing common user configurations..."
