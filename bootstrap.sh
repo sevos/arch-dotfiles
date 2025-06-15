@@ -65,7 +65,13 @@ else
 fi
 
 # Detect hostname
-HOSTNAME=$(hostname)
+if [[ -r /etc/hostname ]]; then
+    HOSTNAME=$(cat /etc/hostname)
+elif [[ -n "$HOSTNAME" ]]; then
+    HOSTNAME="$HOSTNAME"
+else
+    HOSTNAME="unknown"
+fi
 log "Detected hostname: $HOSTNAME"
 
 # Remove existing directory if it exists

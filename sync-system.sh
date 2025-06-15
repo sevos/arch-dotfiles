@@ -7,7 +7,13 @@
 set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOSTNAME=$(hostname)
+if [[ -r /etc/hostname ]]; then
+    HOSTNAME=$(cat /etc/hostname)
+elif [[ -n "$HOSTNAME" ]]; then
+    HOSTNAME="$HOSTNAME"
+else
+    HOSTNAME="unknown"
+fi
 
 BOLD='\033[1m'
 GREEN='\033[0;32m'
