@@ -150,18 +150,67 @@ else
     "
 fi
 
+# Function to stow with adopt and selective reset
+stow_with_adopt() {
+    local stow_dir="$1"
+    local stow_type="$2"
+    
+    # Check if directory is a git repo for selective reset
+    if [[ -d ".git" ]]; then
+        log "Recording modified files before stowing $stow_type configurations..."
+        # Create temp directory for tracking
+        local temp_dir=$(mktemp -d)
+        
+        # Record currently modified files
+        git diff --name-only > "$temp_dir/pre-adopt-modified.txt" 2>/dev/null || true
+        git diff --staged --name-only >> "$temp_dir/pre-adopt-modified.txt" 2>/dev/null || true
+        
+        # Stow with adopt to handle conflicts
+        log "Stowing $stow_type configurations with --adopt..."
+        if run_as_root stow -t / --adopt --ignore='post-install.d' "$stow_dir"; then
+            # Check for newly adopted files
+            git diff --name-only > "$temp_dir/post-adopt-modified.txt" 2>/dev/null || true
+            
+            # Find files that were adopted (modified after stow but not before)
+            if [[ -s "$temp_dir/post-adopt-modified.txt" ]]; then
+                local adopted_files=$(comm -13 <(sort "$temp_dir/pre-adopt-modified.txt" 2>/dev/null) <(sort "$temp_dir/post-adopt-modified.txt") 2>/dev/null || true)
+                
+                if [[ -n "$adopted_files" ]]; then
+                    log "Resetting adopted files to repository versions..."
+                    echo "$adopted_files" | while IFS= read -r file; do
+                        if [[ -n "$file" ]]; then
+                            git checkout -- "$file" 2>/dev/null && log "  Reset: $file" || warn "  Failed to reset: $file"
+                        fi
+                    done
+                    
+                    # Restow to ensure symlinks point to our configs
+                    log "Restowing $stow_type configurations..."
+                    run_as_root stow -R -t / --ignore='post-install.d' "$stow_dir" || warn "Failed to restow $stow_type configurations"
+                fi
+            fi
+        else
+            error "Failed to stow $stow_type configurations"
+        fi
+        
+        # Cleanup
+        rm -rf "$temp_dir"
+    else
+        # Not a git repo, use standard stow
+        log "Stowing $stow_type configurations..."
+        run_as_root stow -t / --ignore='post-install.d' "$stow_dir" || error "Failed to stow $stow_type configurations"
+    fi
+}
+
 # Stow common system configurations
 if [[ -d "system-common" ]]; then
-    log "Stowing common system configurations..."
-    run_as_root stow -t / --ignore='post-install.d' system-common || error "Failed to stow common system configurations"
+    stow_with_adopt "system-common" "common system"
 else
     warn "system-common directory not found"
 fi
 
 # Stow machine-specific system configurations
 if [[ -d "system-$HOSTNAME" ]]; then
-    log "Stowing $HOSTNAME-specific system configurations..."
-    run_as_root stow -t / --ignore='post-install.d' "system-$HOSTNAME" || error "Failed to stow $HOSTNAME-specific system configurations"
+    stow_with_adopt "system-$HOSTNAME" "$HOSTNAME-specific system"
 else
     warn "system-$HOSTNAME directory not found"
 fi
