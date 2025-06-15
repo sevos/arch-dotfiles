@@ -1,5 +1,7 @@
 greetd
 greetd-regreet
+gtk4
+libadwaita
 niri
 fuzzel
 mako
