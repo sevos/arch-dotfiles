@@ -1,4 +1,2 @@
-google-chrome-stable
-1password
+google-chrome
 watchman
-slack-desktop-wayland
