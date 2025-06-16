@@ -33,3 +33,5 @@ less
 fzf
 zoxide
 lazygit
+jq
+linux-headers

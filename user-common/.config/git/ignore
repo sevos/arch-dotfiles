@@ -55,3 +55,4 @@ Cargo.lock
 build/
 dist/
 out/
+**/.claude/settings.local.json
