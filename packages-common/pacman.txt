@@ -23,6 +23,7 @@ brightnessctl
 wireplumber
 pipewire
 pipewire-pulse
+pavucontrol
 wl-clipboard
 nitrogen
 mise

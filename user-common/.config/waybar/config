@@ -18,7 +18,7 @@
         "format-bluetooth": "{volume}% {icon}",
         "format-muted": "",
         "format-icons": ["", "", ""],
-        "on-click": "kcmshell6 kcm_pulseaudio"
+        "on-click": "pavucontrol"
     },
     "clock": {
         "format": "{:%H:%M}",
