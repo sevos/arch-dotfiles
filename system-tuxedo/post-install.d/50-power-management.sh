@@ -189,10 +189,8 @@ log "Configuring system power management..."
 # Reload systemd configuration
 systemctl daemon-reload
 
-# Apply logind configuration if present
-if systemctl is-active systemd-logind.service &>/dev/null; then
-    systemctl restart systemd-logind
-fi
+# Logind configuration has been updated
+log "Logind configuration updated. Changes will take effect after reboot."
 
 # Display configuration summary
 log "Power management configuration completed:"
@@ -209,9 +207,15 @@ echo "    - AMD Radeon 780M runtime power management"
 
 if bootctl status &>/dev/null; then
     log "systemd-boot configuration updated"
-    log "Reboot required to apply kernel parameter changes"
 else
     log "Manual bootloader configuration may be required"
 fi
 
 log "Tuxedo InfinityBook Gen9 AMD power management setup completed"
+log ""
+log "IMPORTANT: Reboot required to apply:"
+log "  - Kernel parameter changes"
+log "  - Logind power button/lid behavior"  
+log "  - Module configurations"
+log ""
+log "Please reboot your system to activate all changes."
