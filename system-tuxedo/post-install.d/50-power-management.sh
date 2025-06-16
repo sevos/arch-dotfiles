@@ -37,23 +37,26 @@ if bootctl status &>/dev/null; then
         ENTRY_FILE="/boot/loader/entries/${CURRENT_ENTRY}"
         
         if [[ -f "$ENTRY_FILE" ]]; then
-            # Check if AMD parameters are already present
-            if ! grep -q "acpi.ec_no_wakeup=1" "$ENTRY_FILE"; then
-                log "Adding AMD optimization parameters to $ENTRY_FILE"
-                
-                # Backup original file
-                cp "$ENTRY_FILE" "${ENTRY_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
-                
-                # Remove old acpi_os_name parameter if present
-                sed -i 's/acpi_os_name=Linux //g' "$ENTRY_FILE"
-                
-                # Add AMD parameters to options line
-                sed -i "s/^options \(.*\)$/options \1 $REQUIRED_PARAMS/" "$ENTRY_FILE"
-                
-                log "AMD optimization parameters added to boot entry"
-            else
-                log "AMD optimization parameters already present in boot entry"
-            fi
+            # Always cleanup old parameters and ensure AMD parameters are present
+            log "Cleaning up and configuring AMD optimization parameters in $ENTRY_FILE"
+            
+            # Backup original file
+            cp "$ENTRY_FILE" "${ENTRY_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+            
+            # Remove old problematic ACPI parameters
+            sed -i 's/acpi_os_name=Linux //g' "$ENTRY_FILE"
+            sed -i 's/acpi_osi=[^ ]* //g' "$ENTRY_FILE"
+            sed -i 's/acpi_osi= //g' "$ENTRY_FILE"
+            
+            # Remove existing AMD parameters to avoid duplicates
+            sed -i 's/acpi\.ec_no_wakeup=[^ ]* //g' "$ENTRY_FILE"
+            sed -i 's/mem_sleep_default=[^ ]* //g' "$ENTRY_FILE"
+            sed -i 's/amd_pstate=[^ ]* //g' "$ENTRY_FILE"
+            
+            # Add AMD parameters to options line
+            sed -i "s/^options \(.*\)$/options \1 $REQUIRED_PARAMS/" "$ENTRY_FILE"
+            
+            log "AMD optimization parameters configured in boot entry"
         else
             log "Warning: Boot entry file not found: $ENTRY_FILE"
         fi
