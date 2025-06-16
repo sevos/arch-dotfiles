@@ -247,6 +247,11 @@ layout {
     }
 }
 
+// Set environment variables for all applications
+environment {
+    DISPLAY ":0"
+}
+
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
@@ -267,8 +272,8 @@ spawn-at-startup "bash" "-c" "niri msg action focus-workspace 2 && slack --enabl
 // Start Claude Desktop at startup
 spawn-at-startup "bash" "-c" "eval \"$(mise activate bash)\" && exec /home/sevos/AppImages/claude.appimage"
 
-// Start xwayland-satellite for X11 app compatibility and set DISPLAY
-spawn-at-startup "bash" "-c" "xwayland-satellite & sleep 0.5 && export DISPLAY=:0"
+// Start xwayland-satellite for X11 app compatibility
+spawn-at-startup "xwayland-satellite"
 
 // Start Alacritty terminal at startup
 spawn-at-startup "alacritty"

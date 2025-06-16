@@ -15,6 +15,7 @@ swaybg
 swaylock
 swayidle
 xwayland-satellite
+xorg-xwayland
 xdg-desktop-portal-gtk
 gnome-keyring
 polkit-gnome
