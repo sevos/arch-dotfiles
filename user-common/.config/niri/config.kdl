@@ -263,8 +263,8 @@ spawn-at-startup "waybar"
 // Start wallpaper watcher
 spawn-at-startup "~/.config/niri/wallpaper_watcher.sh"
 
-// Start 1Password silently at startup
-spawn-at-startup "1password" "--silent"
+// Start 1Password silently at startup (with delay for X session)
+spawn-at-startup "bash" "-c" "sleep 3 && 1password --silent"
 
 // Start Slack in system tray at startup with Wayland support on workspace 2, then return to workspace 1
 spawn-at-startup "bash" "-c" "niri msg action focus-workspace 2 && slack --enable-features=UseOzonePlatform --ozone-platform=wayland --background & sleep 2 && niri msg action focus-workspace 1"
