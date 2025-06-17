@@ -1,0 +1,3 @@
+networkmanager
+wireguard-tools
+network-manager-applet
