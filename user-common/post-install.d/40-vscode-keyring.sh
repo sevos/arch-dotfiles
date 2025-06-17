@@ -5,7 +5,7 @@ set -euo pipefail
 
 echo "Configuring VS Code GNOME Keyring integration..."
 
-# Define VS Code config directory
+# Define VS Code config directory and argv.json file
 VSCODE_DIR="$HOME/.vscode"
 ARGV_JSON="$VSCODE_DIR/argv.json"
 

@@ -253,6 +253,8 @@ environment {
     XDG_CURRENT_DESKTOP "niri"
     // Ensure Secret Service API is available
     GNOME_KEYRING_CONTROL "/run/user/1000/keyring"
+    // Force GTK applications to use dark theme
+    GTK_THEME "Adwaita:dark"
 }
 
 // Add lines like this to spawn processes at startup.
