@@ -5,12 +5,26 @@
     "spacing": 4,
     "modules-left": [],
     "modules-center": ["clock"],
-    "modules-right": ["bluetooth", "pulseaudio", "tray"],
+    "modules-right": ["bluetooth", "pulseaudio", "battery", "tray"],
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    },
     "bluetooth": {
-        "format": "{status}",
-        "format-connected": " {device_alias}",
-        "format-on": "",
-        "format-off": "",
+        "format": "BT:{status}",
+        "format-disabled": "BT:disabled",
+        "format-off": "BT:off", 
+        "format-on": "BT:on",
+        "format-connected": "BT: {device_alias}",
+        "tooltip-format": "{controller_alias}\t{controller_address}",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n{device_enumerate}",
         "on-click": "blueman-manager"
     },
     "pulseaudio": {

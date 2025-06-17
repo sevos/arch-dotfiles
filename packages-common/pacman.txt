@@ -28,6 +28,9 @@ wireplumber
 pipewire
 pipewire-pulse
 pavucontrol
+bluez
+bluez-utils
+blueman
 wl-clipboard
 nitrogen
 mise
