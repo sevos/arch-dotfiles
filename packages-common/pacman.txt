@@ -21,6 +21,7 @@ xdg-desktop-portal-gtk
 xdg-desktop-portal-gnome
 xdg-desktop-portal-wlr
 gnome-keyring
+gcr
 polkit-gnome
 brightnessctl
 wireplumber
