@@ -14,5 +14,11 @@ export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=niri
 export XDG_CURRENT_DESKTOP=niri
 
-# Start niri
-exec niri
+# Start GNOME Keyring daemon for Secret Service API (without SSH agent)
+if command -v gnome-keyring-daemon >/dev/null 2>&1; then
+    eval "$(gnome-keyring-daemon --start --components=secrets)"
+    export SSH_AUTH_SOCK  # Keep 1Password SSH agent
+fi
+
+# Start niri with session management
+exec niri --session

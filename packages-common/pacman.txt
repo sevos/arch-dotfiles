@@ -16,7 +16,10 @@ swaylock
 swayidle
 xwayland-satellite
 xorg-xwayland
+xdg-desktop-portal
 xdg-desktop-portal-gtk
+xdg-desktop-portal-gnome
+xdg-desktop-portal-wlr
 gnome-keyring
 polkit-gnome
 brightnessctl

@@ -250,6 +250,9 @@ layout {
 // Set environment variables for all applications
 environment {
     DISPLAY ":0"
+    XDG_CURRENT_DESKTOP "niri"
+    // Ensure Secret Service API is available
+    GNOME_KEYRING_CONTROL "/run/user/1000/keyring"
 }
 
 // Add lines like this to spawn processes at startup.
@@ -282,7 +285,7 @@ spawn-at-startup "alacritty"
 spawn-at-startup "bash" "-c" "sleep 2 && DISPLAY=:0 exec google-chrome-stable --profile-directory='Default' $CHROME_FLAGS"
 
 // Start polkit authentication agent for password prompts
-spawn-at-startup "/usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1"
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
 // If the client will specifically ask for CSD, the request will be honored.

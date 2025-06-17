@@ -73,3 +73,7 @@ GNU Stow-based dotfiles management for Arch Linux systems with multi-machine sup
 - Test on clean Arch installations before deployment
 - Follow Arch Linux best practices and wiki recommendations
 - Never add comments to aur.txt or pacman.txt
+
+## System Configuration Principles
+
+- Remember that we are working on reproducible dotfiles with install scripts. As you introspect the current system by running commands, any change introduced to the system should go through changes applied by sync-system and sync-user scripts
