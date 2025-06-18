@@ -77,3 +77,6 @@ GNU Stow-based dotfiles management for Arch Linux systems with multi-machine sup
 ## System Configuration Principles
 
 - Remember that we are working on reproducible dotfiles with install scripts. As you introspect the current system by running commands, any change introduced to the system should go through changes applied by sync-system and sync-user scripts
+
+## Memory Notes
+- check /etc/hostname for hostname
