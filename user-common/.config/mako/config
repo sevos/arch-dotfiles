@@ -1,0 +1,27 @@
+# Mako notification daemon configuration
+
+# Position and layout
+anchor=top-right
+margin=10
+padding=15
+border-size=2
+border-radius=10
+
+# Colors (matching your Niri blue theme)
+background-color=#2e3440
+text-color=#d5d8dc
+border-color=#7fc8ff
+
+# Font
+font=Cascadia Code 11
+
+# Behavior
+default-timeout=5000
+ignore-timeout=1
+max-visible=5
+
+# Interaction
+on-button-left=dismiss
+on-button-middle=none
+on-button-right=dismiss-all
+on-touch=dismiss

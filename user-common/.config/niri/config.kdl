@@ -265,6 +265,9 @@ environment {
 // Start waybar status bar
 spawn-at-startup "waybar"
 
+// Start mako notification daemon
+spawn-at-startup "mako"
+
 // Start wallpaper watcher
 spawn-at-startup "~/.config/niri/wallpaper_watcher.sh"
 
