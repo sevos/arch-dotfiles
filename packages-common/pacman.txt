@@ -32,6 +32,9 @@ bluez
 bluez-utils
 blueman
 wl-clipboard
+wf-recorder
+slurp
+wlr-randr
 nitrogen
 mise
 procps-ng

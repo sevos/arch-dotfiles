@@ -1,0 +1,145 @@
+#!/bin/bash
+
+# Toggle script for wf-recorder with Niri compositor
+# Supports full screen recording and region selection
+
+PIDFILE="/tmp/wf-recorder.pid"
+OUTPUT_DIR="$HOME/Videos/Recordings"
+LOG_DIR="$OUTPUT_DIR/.logs"
+NOTIFICATION_ICON="/usr/share/icons/hicolor/scalable/apps/camera-video-symbolic.svg"
+
+# Create output and log directories if they don't exist
+mkdir -p "$OUTPUT_DIR"
+mkdir -p "$LOG_DIR"
+
+# Setup logging
+LOG_FILE="$LOG_DIR/wf-recorder-$(date +%Y%m%d-%H%M%S).log"
+exec 2>&1
+exec > >(tee -a "$LOG_FILE")
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting toggle-screen-recording script"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Script arguments: $*"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Environment: WAYLAND_DISPLAY=$WAYLAND_DISPLAY"
+
+if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+    # Recording is active, stop it
+    PID=$(cat "$PIDFILE")
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Stopping recording with PID $PID"
+    kill -SIGINT "$PID"
+    rm -f "$PIDFILE"
+    
+    # Send notification
+    notify-send -i "$NOTIFICATION_ICON" "Screen Recording" "Recording stopped" -t 2000
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Recording stopped successfully"
+else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] No active recording found, starting new recording"
+    # Check if slurp is available for region selection
+    if command -v slurp &> /dev/null && [ "$1" = "region" ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Region selection mode requested"
+        # Select region with slurp
+        GEOMETRY=$(slurp 2>&1)
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Slurp output: $GEOMETRY"
+        if [ -z "$GEOMETRY" ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Region selection cancelled"
+            notify-send -i "$NOTIFICATION_ICON" "Screen Recording" "Region selection cancelled" -t 2000
+            exit 0
+        fi
+        RECORD_ARGS="-g $GEOMETRY"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Recording region: $GEOMETRY"
+    else
+        # Full screen mode - let user select which output
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Full screen mode - detecting available outputs"
+        
+        # Get list of available outputs
+        # Try using wlr-randr first, fallback to other methods
+        if command -v wlr-randr &> /dev/null; then
+            OUTPUTS=$(wlr-randr --json 2>/dev/null | jq -r '.[] | select(.enabled) | .name' 2>/dev/null || true)
+        fi
+        
+        # If wlr-randr failed or not available, try swaymsg (works with some wlroots compositors)
+        if [ -z "$OUTPUTS" ] && command -v swaymsg &> /dev/null; then
+            OUTPUTS=$(swaymsg -t get_outputs 2>/dev/null | jq -r '.[] | select(.active) | .name' 2>/dev/null || true)
+        fi
+        
+        # If we still don't have outputs, try to get from /sys/class/drm
+        if [ -z "$OUTPUTS" ]; then
+            OUTPUTS=$(ls /sys/class/drm/*/status 2>/dev/null | grep -E "connected$" | sed 's|/sys/class/drm/||;s|/status||' | grep -E "^card[0-9]+-" | sed 's/^card[0-9]-//' || true)
+        fi
+        
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Available outputs: $(echo $OUTPUTS | tr '\n' ' ')"
+        
+        # If we have multiple outputs, show selection menu
+        if [ -n "$OUTPUTS" ] && [ $(echo "$OUTPUTS" | wc -l) -gt 1 ]; then
+            # Create menu options
+            MENU_OPTIONS="All Screens"$'\n'"$OUTPUTS"
+            
+            # Show fuzzel menu for output selection
+            SELECTED=$(echo "$MENU_OPTIONS" | fuzzel --dmenu --prompt="Select screen to record: " --lines=10 2>&1)
+            
+            if [ -z "$SELECTED" ]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] Output selection cancelled"
+                notify-send -i "$NOTIFICATION_ICON" "Screen Recording" "Output selection cancelled" -t 2000
+                exit 0
+            fi
+            
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Selected output: $SELECTED"
+            
+            if [ "$SELECTED" = "All Screens" ]; then
+                RECORD_ARGS=""
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] Recording all screens"
+            else
+                RECORD_ARGS="-o $SELECTED"
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] Recording output: $SELECTED"
+            fi
+        elif [ -n "$OUTPUTS" ]; then
+            # Single output, use it
+            OUTPUT=$(echo "$OUTPUTS" | head -n1)
+            RECORD_ARGS="-o $OUTPUT"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Single output detected: $OUTPUT"
+        else
+            # No outputs detected, try recording anyway
+            RECORD_ARGS=""
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: No outputs detected, attempting to record default"
+        fi
+    fi
+    
+    # Start recording
+    FILENAME="$OUTPUT_DIR/recording-$(date +%Y%m%d-%H%M%S).mp4"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Output file: $FILENAME"
+    
+    # Create log file for wf-recorder output
+    WF_LOG="$LOG_DIR/wf-recorder-$(date +%Y%m%d-%H%M%S)-output.log"
+    
+    # Start wf-recorder with software encoding first
+    # Hardware encoding seems to have issues with Niri
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting with software encoding (libx264)"
+    wf-recorder -f "$FILENAME" -c libx264 -r 30 $RECORD_ARGS > "$WF_LOG" 2>&1 &
+    PID=$!
+    
+    # Give it a moment to start
+    sleep 0.5
+    
+    # Check if wf-recorder started successfully
+    if kill -0 "$PID" 2>/dev/null; then
+        echo "$PID" > "$PIDFILE"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Recording started successfully with PID $PID (software encoding)"
+        notify-send -i "$NOTIFICATION_ICON" "Screen Recording" "Recording started: $(basename "$FILENAME")" -t 2000
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Software encoding failed, trying with minimal options"
+        # Try with minimal options
+        wf-recorder -f "$FILENAME" $RECORD_ARGS >> "$WF_LOG" 2>&1 &
+        PID=$!
+        sleep 0.5
+        if kill -0 "$PID" 2>/dev/null; then
+            echo "$PID" > "$PIDFILE"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Recording started successfully with PID $PID (minimal options)"
+            notify-send -i "$NOTIFICATION_ICON" "Screen Recording" "Recording started (minimal): $(basename "$FILENAME")" -t 2000
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to start recording"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Check $WF_LOG for details"
+            notify-send -i "$NOTIFICATION_ICON" "Screen Recording Error" "Failed to start recording - check logs" -u critical
+        fi
+    fi
+fi
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Script completed"

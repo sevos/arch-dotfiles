@@ -605,7 +605,7 @@ binds {
     Mod+Period { expel-window-from-column; }
 
     Mod+R { switch-preset-column-width; }
-    Mod+Shift+R { switch-preset-window-height; }
+    // Mod+Shift+R { switch-preset-window-height; }
     Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
@@ -655,6 +655,10 @@ binds {
     Mod+Print { screenshot-screen; }
     Mod+Alt+Print { screenshot-window; }
 
+    // Screen recording with wf-recorder
+    Mod+Shift+R hotkey-overlay-title="Toggle Screen Recording" { spawn "~/.local/bin/toggle-screen-recording"; }
+    Mod+Shift+Alt+R hotkey-overlay-title="Record Screen Region" { spawn "~/.local/bin/toggle-screen-recording" "region"; }
+
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here
     // so they may, for example, forward  the key presses as-is to a remote machine.
@@ -672,7 +676,4 @@ binds {
     // Powers off the monitors. To turn them back on, do any input like
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
-
-    // Toggle recording with HTTP API calls
-    Mod+Less { spawn "sh" "-c" "~/.config/niri/toggle-recording.sh"; }
 }
