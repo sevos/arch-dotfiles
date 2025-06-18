@@ -74,17 +74,26 @@ cleanup_orphaned_dotfiles_links() {
             local link_target
             link_target=$(readlink "$link" 2>/dev/null || echo "")
             
-            # Check if symlink points to our dotfiles directory
-            if [[ "$link_target" == "$dotfiles_dir"* ]]; then
+            # Resolve the absolute path of the symlink target
+            local abs_link_target=""
+            if [[ -n "$link_target" ]]; then
+                # Get the directory containing the symlink
+                local link_dir=$(dirname "$link")
+                # Try to resolve the absolute path (even if target doesn't exist)
+                abs_link_target=$(cd "$link_dir" 2>/dev/null && realpath -m "$link_target" 2>/dev/null || echo "")
+            fi
+            
+            # Check if symlink points to our dotfiles directory (either relative or absolute)
+            if [[ "$link_target" == *"$dotfiles_dir"* ]] || [[ "$abs_link_target" == "$dotfiles_dir"* ]]; then
                 log "Removing orphaned symlink: $link -> $link_target"
-                if rm "$link" 2>/dev/null; then
+                if run_as_root rm "$link" 2>/dev/null; then
                     ((cleaned_count++))
                 else
                     warn "Failed to remove orphaned symlink: $link"
                 fi
             fi
         fi
-    done < <(find "$target_dir" -type l -print0 2>/dev/null)
+    done < <(find "$target_dir" -path "/.snapshots" -prune -o -type l -print0 2>/dev/null)
     
     if [[ $cleaned_count -gt 0 ]]; then
         log "Removed $cleaned_count orphaned dotfiles symlink(s)"
@@ -159,7 +168,7 @@ else
         GREEN='$GREEN'
         YELLOW='$YELLOW'
         NC='$NC'
-        $(declare -f cleanup_orphaned_dotfiles_links log warn)
+        $(declare -f cleanup_orphaned_dotfiles_links log warn run_as_root)
         cleanup_orphaned_dotfiles_links '/' '$DOTFILES_DIR'
     "
 fi
