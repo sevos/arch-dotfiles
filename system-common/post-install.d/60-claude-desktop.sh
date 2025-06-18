@@ -8,6 +8,8 @@ REPO_URL="https://github.com/aaddrick/claude-desktop-arch.git"
 BUILD_DIR="/opt/claude-desktop-arch"
 PACKAGE_NAME="claude-desktop"
 LOG_FILE="/var/log/claude-desktop-install.log"
+LAST_RUN_FILE="/var/log/claude-desktop-last-run"
+WEEK_IN_SECONDS=604800  # 7 days * 24 hours * 60 minutes * 60 seconds
 
 # Logging function
 log() {
@@ -21,6 +23,41 @@ get_installed_version() {
     else
         echo "not_installed"
     fi
+}
+
+# Get last run timestamp
+get_last_run_time() {
+    if [ -f "$LAST_RUN_FILE" ]; then
+        cat "$LAST_RUN_FILE"
+    else
+        echo "0"
+    fi
+}
+
+# Check if script should run based on time constraint
+should_run() {
+    local current_time=$(date +%s)
+    local last_run_time=$(get_last_run_time)
+    local time_diff=$((current_time - last_run_time))
+    
+    # Always run if never run before
+    if [ "$last_run_time" = "0" ]; then
+        return 0
+    fi
+    
+    # Run if a week has passed
+    if [ "$time_diff" -ge "$WEEK_IN_SECONDS" ]; then
+        return 0
+    fi
+    
+    # Don't run if less than a week
+    return 1
+}
+
+# Update last run timestamp
+update_last_run_time() {
+    date +%s > "$LAST_RUN_FILE"
+    chmod 644 "$LAST_RUN_FILE"
 }
 
 # Get available version from the repository
@@ -111,6 +148,21 @@ main() {
         exit 1
     fi
     
+    # Check if Claude Desktop is already installed
+    INSTALLED_VERSION=$(get_installed_version)
+    
+    # If already installed, check if we should run based on time constraint
+    if [ "$INSTALLED_VERSION" != "not_installed" ]; then
+        if ! should_run; then
+            local last_run_time=$(get_last_run_time)
+            local current_time=$(date +%s)
+            local time_diff=$((current_time - last_run_time))
+            local days_left=$(( (WEEK_IN_SECONDS - time_diff) / 86400 ))
+            log "Claude Desktop already installed (version $INSTALLED_VERSION). Skipping update check - $days_left days until next check allowed."
+            exit 0
+        fi
+    fi
+    
     # Setup repository
     setup_repository
     
@@ -124,6 +176,8 @@ main() {
     # Check if update is needed
     if [ "$INSTALLED_VERSION" = "$AVAILABLE_VERSION" ]; then
         log "Claude Desktop is already up to date (version $INSTALLED_VERSION)"
+        # Update timestamp even if no installation needed to reset weekly timer
+        update_last_run_time
         exit 0
     fi
     
@@ -135,6 +189,10 @@ main() {
     
     # Build and install
     build_and_install
+    
+    # Update timestamp after successful installation
+    update_last_run_time
+    log "Claude Desktop setup completed successfully - next check allowed in 7 days"
 }
 
 # Run main function
