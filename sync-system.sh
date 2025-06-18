@@ -129,6 +129,15 @@ fi
 
 # Install AUR packages (if yay is available)
 if command -v yay &> /dev/null; then
+    # Check if mise Python is in PATH and temporarily remove it for AUR builds
+    ORIGINAL_PATH="$PATH"
+    if command -v mise &> /dev/null && python --version 2>&1 | grep -q "Python" && which python | grep -q "mise"; then
+        log "Detected mise-managed Python in PATH. Temporarily removing mise from PATH for AUR builds..."
+        # Remove mise paths from PATH
+        NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -v "mise" | tr '\n' ':' | sed 's/:$//')
+        export PATH="$NEW_PATH"
+        log "Using system Python for AUR builds: $(which python 2>/dev/null || echo 'none found')"
+    fi
     if [[ -f "packages-common/aur.txt" && -s "packages-common/aur.txt" ]]; then
         log "Installing common AUR packages..."
         # Filter out empty lines and comments, then install
@@ -154,6 +163,12 @@ if command -v yay &> /dev/null; then
     fi
 else
     warn "yay not found. Skipping AUR package installation."
+fi
+
+# Restore original PATH if it was modified for AUR builds
+if [[ -n "$ORIGINAL_PATH" && "$PATH" != "$ORIGINAL_PATH" ]]; then
+    log "Restoring original PATH after AUR builds..."
+    export PATH="$ORIGINAL_PATH"
 fi
 
 # Now stow configurations after all packages are installed
