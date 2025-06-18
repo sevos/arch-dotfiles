@@ -35,6 +35,7 @@ wl-clipboard
 wf-recorder
 slurp
 wlr-randr
+celluloid
 nitrogen
 mise
 procps-ng
