@@ -12,7 +12,6 @@ mako
 waybar
 alacritty
 swaybg
-swaylock
 swayidle
 xwayland-satellite
 xorg-xwayland

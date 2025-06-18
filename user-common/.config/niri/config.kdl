@@ -268,6 +268,9 @@ spawn-at-startup "waybar"
 // Start mako notification daemon
 spawn-at-startup "mako"
 
+// Start swayidle for session locking support
+spawn-at-startup "swayidle" "-w"
+
 // Start wallpaper watcher
 spawn-at-startup "~/.config/niri/wallpaper_watcher.sh"
 
@@ -434,7 +437,7 @@ binds {
     Mod+B hotkey-overlay-title="Open Google Chrome" { spawn "bash" "-c" "DISPLAY=:0 exec google-chrome-stable --profile-directory='Default' $CHROME_FLAGS"; }
     Mod+Shift+B hotkey-overlay-title="Open Google Chrome" { spawn "bash" "-c" "DISPLAY=:0 exec google-chrome-stable $CHROME_FLAGS"; }
     Mod+E hotkey-overlay-title="Open File Manager: Thunar" { spawn "thunar"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock" "--effect-blur" "7x5" "--effect-vignette" "0.5:0.5" "--ring-color" "7fc8ff" "--key-hl-color" "ffffff" "--line-color" "00000000" "--inside-color" "00000088" "--separator-color" "00000000" "--grace" "2" "--fade-in" "0.2"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock" "--screenshots" "--effect-blur" "7x5" "--effect-vignette" "0.5:0.5" "--ring-color" "7fc8ff" "--key-hl-color" "ffffff" "--line-color" "00000000" "--inside-color" "00000088" "--separator-color" "00000000" "--grace" "2" "--fade-in" "0.2"; }
     Mod+Shift+W hotkey-overlay-title="Change Wallpaper: nitrogen" { spawn "bash" "-c" "DISPLAY=:0 nitrogen"; }
 
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.

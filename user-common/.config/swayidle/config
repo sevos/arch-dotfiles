@@ -1,0 +1,17 @@
+# Swayidle configuration
+# This handles session locking via loginctl lock-session and automatic screen locking
+
+# Lock screen when loginctl lock-session is called
+lock 'swaylock --screenshots --effect-blur 7x5 --effect-vignette 0.5:0.5 --ring-color 7fc8ff --key-hl-color ffffff --line-color 00000000 --inside-color 00000088 --separator-color 00000000 --grace 2 --fade-in 0.2'
+
+# Lock screen before suspend (lid close, etc.)
+before-sleep 'swaylock --screenshots --effect-blur 7x5 --effect-vignette 0.5:0.5 --ring-color 7fc8ff --key-hl-color ffffff --line-color 00000000 --inside-color 00000088 --separator-color 00000000 --grace 2 --fade-in 0.2'
+
+# Auto-lock after 10 minutes of inactivity
+timeout 600 'swaylock --screenshots --effect-blur 7x5 --effect-vignette 0.5:0.5 --ring-color 7fc8ff --key-hl-color ffffff --line-color 00000000 --inside-color 00000088 --separator-color 00000000 --grace 2 --fade-in 0.2'
+
+# Turn off displays after 12 minutes of inactivity  
+timeout 720 'niri msg action power-off-monitors' resume 'niri msg action power-on-monitors'
+
+# Suspend system after 30 minutes of inactivity
+timeout 1800 'systemctl suspend'
