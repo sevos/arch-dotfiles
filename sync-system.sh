@@ -105,8 +105,33 @@ cleanup_orphaned_dotfiles_links() {
 log "Starting system configuration sync for machine: $HOSTNAME"
 cd "$DOTFILES_DIR"
 
-# Update pacman database first
-log "Updating pacman database..."
+# Function to ensure multilib repository is enabled
+ensure_multilib_enabled() {
+    log "Checking multilib repository status..."
+    
+    if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
+        log "Enabling multilib repository..."
+        
+        # Create a backup of pacman.conf
+        run_as_root cp /etc/pacman.conf /etc/pacman.conf.backup.$(date +%Y%m%d_%H%M%S)
+        
+        # Enable multilib by uncommenting the section
+        run_as_root sed -i '/^#\[multilib\]/,/^#Include = \/etc\/pacman.d\/mirrorlist/ {
+            s/^#\[multilib\]/[multilib]/
+            s/^#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/
+        }' /etc/pacman.conf
+        
+        log "Multilib repository enabled"
+    else
+        log "Multilib repository is already enabled"
+    fi
+}
+
+# Ensure multilib is enabled before updating packages
+ensure_multilib_enabled
+
+# Update pacman database and system
+log "Updating pacman database and system..."
 run_as_root pacman -Syu --noconfirm || error "Failed to update system"
 
 # Install all packages first to avoid conflicts with stowed files

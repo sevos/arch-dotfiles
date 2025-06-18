@@ -1,3 +1,5 @@
 nvidia
 nvidia-utils
 nvidia-settings
+steam
+ttf-liberation
