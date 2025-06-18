@@ -71,3 +71,8 @@ icoutils
 imagemagick
 wget
 git
+python-build
+python-installer
+python-setuptools
+python-wheel
+desktop-file-utils

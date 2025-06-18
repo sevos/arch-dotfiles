@@ -3,3 +3,4 @@ google-chrome
 slack-desktop-wayland
 visual-studio-code-bin
 swaylock-effects
+zapzap
