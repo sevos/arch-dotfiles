@@ -76,3 +76,5 @@ python-installer
 python-setuptools
 python-wheel
 desktop-file-utils
+docker
+docker-compose
