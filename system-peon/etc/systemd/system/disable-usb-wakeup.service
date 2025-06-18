@@ -1,0 +1,12 @@
+[Unit]
+Description=Disable USB device wake-up to prevent immediate suspend wake
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'for dev in /sys/bus/usb/devices/*/power/wakeup; do if [ -w "$dev" ] && [ "$(cat "$dev")" = "enabled" ]; then echo disabled > "$dev"; fi; done'
+ExecStart=/bin/sh -c 'echo "USB wake-up disabled for all enabled devices"'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
