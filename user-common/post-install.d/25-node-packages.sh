@@ -1,0 +1,18 @@
+#!/bin/bash
+# Install Node packages (idempotent)
+
+set -e
+
+echo "Installing Node packages..."
+
+# Ensure mise environment is loaded for subsequent commands
+eval "$(mise activate bash)"
+
+# Check if claude command is available
+if command -v claude >/dev/null 2>&1; then
+    echo "Claude CLI is already installed"
+else
+    echo "Installing Claude CLI globally..."
+    npm install -g @anthropic-ai/claude-code
+    echo "Claude CLI installed"
+fi
