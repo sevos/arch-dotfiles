@@ -9,6 +9,10 @@ esac
 # 1Password SSH Agent
 export SSH_AUTH_SOCK=~/.1password/agent.sock
 
+# Default editors
+export EDITOR=nvim
+export VISUAL="code --wait"
+
 # History configuration
 HISTCONTROL=ignoreboth
 HISTSIZE=10000
