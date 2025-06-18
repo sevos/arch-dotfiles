@@ -37,9 +37,11 @@ mise
 procps-ng
 starship
 bat
+btop
 less
 fzf
 zoxide
 lazygit
 jq
+neovim
 linux-headers
