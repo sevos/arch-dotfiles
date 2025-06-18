@@ -80,3 +80,4 @@ GNU Stow-based dotfiles management for Arch Linux systems with multi-machine sup
 
 ## Memory Notes
 - check /etc/hostname for hostname
+- Use cat /etc/hostname to determine hostname when `hostname` command is not available
