@@ -36,6 +36,7 @@ wf-recorder
 slurp
 wlr-randr
 celluloid
+thunar
 nitrogen
 mise
 procps-ng
