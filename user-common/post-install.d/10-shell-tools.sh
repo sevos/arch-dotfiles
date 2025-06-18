@@ -3,23 +3,29 @@
 
 set -e
 
-echo "Setting up shell tools..."
+# Get the dotfiles directory (going up two levels from post-install.d)
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Source the shared logging library
+source "$DOTFILES_DIR/lib/logging.sh"
+
+info "Setting up shell tools"
 
 # Initialize zoxide database if it doesn't exist
 if [ ! -f "$HOME/.local/share/zoxide/db.zo" ]; then
-    echo "Initializing zoxide database..."
+    substep "Initializing zoxide database"
     mkdir -p "$HOME/.local/share/zoxide"
     # Add current directory to zoxide
     zoxide add "$PWD" 2>/dev/null || true
-    echo "Zoxide database initialized"
+    success "Zoxide database initialized"
 else
-    echo "Zoxide database already exists"
+    info "Zoxide database already exists"
 fi
 
 # Ensure proper permissions for shell files
-echo "Setting proper permissions for shell configuration files..."
+substep "Setting proper permissions for shell configuration files"
 chmod 644 "$HOME/.bashrc" 2>/dev/null || true
 chmod 644 "$HOME/.bash_aliases" 2>/dev/null || true
 chmod 644 "$HOME/.profile" 2>/dev/null || true
 
-echo "Shell tools setup completed"
+success "Shell tools setup completed"

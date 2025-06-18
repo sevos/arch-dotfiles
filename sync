@@ -2,34 +2,55 @@
 
 # Complete Dotfiles Sync Script
 # Runs system sync (as root) followed by user sync (as regular user)
-# Usage: ./sync.sh
+# Usage: ./sync [--quiet|--verbose|--debug]
 
 set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BOLD='\033[1m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
 
-log() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
+# Set default verbosity if not already set
+export DOTFILES_VERBOSITY="${DOTFILES_VERBOSITY:-normal}"
 
-warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --quiet|-q)
+            export DOTFILES_VERBOSITY="quiet"
+            shift
+            ;;
+        --verbose|-v)
+            export DOTFILES_VERBOSITY="verbose"
+            shift
+            ;;
+        --debug|-d)
+            export DOTFILES_VERBOSITY="debug"
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: $0 [--quiet|--verbose|--debug] [username]"
+            echo "  --quiet   Minimal output, errors only"
+            echo "  --verbose Show detailed command output"
+            echo "  --debug   Show debug information"
+            echo "  username  Target user (when running as root)"
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            echo "Use --help for usage information" >&2
+            exit 1
+            ;;
+        *)
+            # Assume it's a username argument
+            break
+            ;;
+    esac
+done
 
-error() {
-    echo -e "${RED}[ERROR]${NC} $1" >&2
-    exit 1
-}
+# Source the shared logging library
+source "$DOTFILES_DIR/lib/logging.sh"
 
-section() {
-    echo -e "\n${BLUE}${BOLD}=== $1 ===${NC}"
-}
+# Initialize logging with total steps
+init_logging 2
 
 # Get the original user (before any sudo operations)
 if [[ -n "$SUDO_USER" ]]; then
@@ -41,31 +62,53 @@ else
     if [[ -n "$1" ]]; then
         ORIGINAL_USER="$1"
     else
-        error "Running as root without specifying target user. Usage: $0 [username]"
+        die "Running as root without specifying target user. Usage: $0 [username]"
     fi
 fi
 
 section "Complete Dotfiles Sync"
-log "Running system sync followed by user sync"
-log "Target user: $ORIGINAL_USER"
+[[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]] && info "Target user: $(highlight "$ORIGINAL_USER")"
+[[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]] && info "Verbosity level: $(highlight "$DOTFILES_VERBOSITY")"
 
-cd "$DOTFILES_DIR"
-
-# Run system sync
-section "System Configuration Sync"
-log "Running sync-system.sh..."
-./sync-system.sh || error "System sync failed"
-
-# Run user sync as the original user
-section "User Configuration Sync"
-log "Running sync-user.sh as $ORIGINAL_USER..."
-if [[ $EUID -eq 0 ]]; then
-    # Running as root, switch to target user
-    sudo -u "$ORIGINAL_USER" ./sync-user.sh || error "User sync failed"
-else
-    # Running as regular user
-    ./sync-user.sh || error "User sync failed"
+# Check sudo access early if we're not root
+if [[ $EUID -ne 0 ]]; then
+    [[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]] && info "Checking sudo access..."
+    if ! sudo -v; then
+        die "Sudo access required for system operations"
+    fi
+    [[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]] && success "Sudo access confirmed"
 fi
 
-section "Complete Sync Finished"
-log "${BOLD}${GREEN}All dotfiles have been successfully synced!${NC}"
+debug "Changing to dotfiles directory: $DOTFILES_DIR"
+cd "$DOTFILES_DIR"
+debug "Current directory: $(pwd)"
+
+# Run system sync
+major_step "System Configuration Sync"
+export DOTFILES_VERBOSITY  # Pass verbosity to child scripts
+
+if ./sync-system.sh; then
+    success "System configuration completed"
+else
+    die "System sync failed"
+fi
+
+# Run user sync as the original user
+major_step "User Configuration Sync"
+if [[ $EUID -eq 0 ]]; then
+    # Running as root, switch to target user
+    if sudo -u "$ORIGINAL_USER" -E ./sync-user.sh; then
+        success "User configuration completed"
+    else
+        die "User sync failed"
+    fi
+else
+    # Running as regular user
+    if ./sync-user.sh; then
+        success "User configuration completed"
+    else
+        die "User sync failed"
+    fi
+fi
+
+final_summary "Dotfiles sync"
