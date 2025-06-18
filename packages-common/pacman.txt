@@ -65,3 +65,10 @@ lazygit
 jq
 neovim
 linux-headers
+nodejs
+npm
+p7zip
+icoutils
+imagemagick
+wget
+git
