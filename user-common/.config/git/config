@@ -65,3 +65,6 @@
 
 [diff]
   tool = vimdiff
+[user]
+	email = artur.roszczyk@gmail.com
+	name = Artur Roszczyk
