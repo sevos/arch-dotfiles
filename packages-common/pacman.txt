@@ -71,6 +71,7 @@ icoutils
 imagemagick
 wget
 git
+github-cli
 python-build
 python-installer
 python-setuptools
