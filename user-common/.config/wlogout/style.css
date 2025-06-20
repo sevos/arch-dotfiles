@@ -1,0 +1,50 @@
+* {
+    background-image: none;
+}
+
+window {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+button {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: transparent;
+    border: none;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 35%;
+    margin: 15px;
+    border-radius: 8px;
+    padding: 40px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    outline: none;
+}
+
+button:focus, button:active {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
+    outline: none;
+}
+
+#lock {
+    background-image: url("icons/lock.svg");
+}
+
+#suspend {
+    background-image: url("icons/suspend.svg");
+}
+
+#shutdown {
+    background-image: url("icons/power.svg");
+}
+
+#reboot {
+    background-image: url("icons/reboot.svg");
+}
+
+#cancel {
+    background-image: url("icons/cancel.svg");
+}

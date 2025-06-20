@@ -681,6 +681,19 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 
-    // Suspend the system
-    Mod+Shift+Escape { spawn "systemctl" "suspend"; }
+    // Open power menu with wlogout
+    Mod+Shift+Escape { spawn "wlogout"; }
+}
+
+// Layer rules for special surfaces like wlogout
+layer-rule {
+    match namespace="wlogout"
+    opacity 0.95
+    geometry-corner-radius 12
+    shadow {
+        on
+        softness 30
+        spread 8
+        color "#00000080"
+    }
 }
