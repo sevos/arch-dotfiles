@@ -5,3 +5,4 @@ visual-studio-code-bin
 swaylock-effects
 zapzap
 wlogout
+system-config-printer

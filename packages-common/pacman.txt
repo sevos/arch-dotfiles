@@ -79,3 +79,8 @@ python-wheel
 desktop-file-utils
 docker
 docker-compose
+cups
+cups-pdf
+avahi
+nss-mdns
+hplip
