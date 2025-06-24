@@ -1,0 +1,165 @@
+#!/bin/bash
+# GPU Switching Script for PEON
+# Switches between NVIDIA and Intel GPU outputs dynamically
+
+set -euo pipefail
+
+# Configuration paths
+NIRI_CONFIG_DIR="$HOME/.config/niri"
+GPU_NVIDIA_CONFIG="$NIRI_CONFIG_DIR/gpu-nvidia.kdl"
+GPU_INTEL_CONFIG="$NIRI_CONFIG_DIR/gpu-intel.kdl"
+GPU_ACTIVE_SYMLINK="$NIRI_CONFIG_DIR/gpu-active.kdl"
+BUILD_SCRIPT="$NIRI_CONFIG_DIR/build-config.sh"
+
+# Function to show usage
+usage() {
+    echo "Usage: $0 [nvidia|intel|toggle|status]"
+    echo ""
+    echo "Commands:"
+    echo "  nvidia  - Switch to NVIDIA GPU (DisplayPort)"
+    echo "  intel   - Switch to Intel GPU (HDMI)"
+    echo "  toggle  - Toggle between GPUs (default)"
+    echo "  status  - Show current GPU status"
+    echo ""
+    exit 1
+}
+
+# Function to get current GPU
+get_current_gpu() {
+    if [[ -L "$GPU_ACTIVE_SYMLINK" ]]; then
+        local target=$(readlink "$GPU_ACTIVE_SYMLINK")
+        case "$target" in
+            "gpu-nvidia.kdl") echo "nvidia" ;;
+            "gpu-intel.kdl") echo "intel" ;;
+            *) echo "unknown" ;;
+        esac
+    else
+        echo "none"
+    fi
+}
+
+# Function to switch to specific GPU
+switch_to_gpu() {
+    local target_gpu="$1"
+    local target_config=""
+    local target_name=""
+    
+    case "$target_gpu" in
+        "nvidia")
+            target_config="$GPU_NVIDIA_CONFIG"
+            target_name="NVIDIA RTX 3060 (DisplayPort)"
+            ;;
+        "intel")
+            target_config="$GPU_INTEL_CONFIG"
+            target_name="Intel UHD Graphics 770 (HDMI)"
+            ;;
+        *)
+            echo "Error: Invalid GPU '$target_gpu'" >&2
+            usage
+            ;;
+    esac
+    
+    # Check if target config exists
+    if [[ ! -f "$target_config" ]]; then
+        echo "Error: GPU configuration not found: $target_config" >&2
+        exit 1
+    fi
+    
+    # Check if build script exists
+    if [[ ! -x "$BUILD_SCRIPT" ]]; then
+        echo "Error: Build script not found or not executable: $BUILD_SCRIPT" >&2
+        exit 1
+    fi
+    
+    # Create/update symlink
+    echo "Switching to $target_name..."
+    ln -sf "gpu-$target_gpu.kdl" "$GPU_ACTIVE_SYMLINK"
+    
+    # Rebuild configuration
+    echo "Rebuilding Niri configuration..."
+    if ! "$BUILD_SCRIPT"; then
+        echo "Error: Failed to rebuild Niri configuration" >&2
+        exit 1
+    fi
+    
+    echo "Successfully switched to $target_name"
+    
+    # Show notification if notify-send is available
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send "GPU Switch" "Switched to $target_name" --icon=display
+    fi
+}
+
+# Function to show current status
+show_status() {
+    local current_gpu=$(get_current_gpu)
+    
+    echo "GPU Switching Status for PEON"
+    echo "============================="
+    
+    case "$current_gpu" in
+        "nvidia")
+            echo "Current GPU: NVIDIA RTX 3060 (DisplayPort)"
+            echo "Status: ✓ NVIDIA active, Intel disabled"
+            ;;
+        "intel")
+            echo "Current GPU: Intel UHD Graphics 770 (HDMI)"
+            echo "Status: ✓ Intel active, NVIDIA disabled"
+            ;;
+        "none")
+            echo "Current GPU: No active configuration"
+            echo "Status: ⚠ No GPU symlink found"
+            ;;
+        "unknown")
+            echo "Current GPU: Unknown configuration"
+            echo "Status: ⚠ Symlink points to unrecognized target"
+            ;;
+    esac
+    
+    echo ""
+    echo "Available commands:"
+    echo "  switch-gpu nvidia  - Switch to NVIDIA GPU"
+    echo "  switch-gpu intel   - Switch to Intel GPU"
+    echo "  switch-gpu toggle  - Toggle between GPUs"
+}
+
+# Function to toggle GPU
+toggle_gpu() {
+    local current_gpu=$(get_current_gpu)
+    
+    case "$current_gpu" in
+        "nvidia")
+            switch_to_gpu "intel"
+            ;;
+        "intel")
+            switch_to_gpu "nvidia"
+            ;;
+        "none"|"unknown")
+            echo "Current GPU state unclear, defaulting to NVIDIA..."
+            switch_to_gpu "nvidia"
+            ;;
+    esac
+}
+
+# Main logic
+case "${1:-toggle}" in
+    "nvidia")
+        switch_to_gpu "nvidia"
+        ;;
+    "intel")
+        switch_to_gpu "intel"
+        ;;
+    "toggle")
+        toggle_gpu
+        ;;
+    "status")
+        show_status
+        ;;
+    "-h"|"--help")
+        usage
+        ;;
+    *)
+        echo "Error: Unknown command '$1'" >&2
+        usage
+        ;;
+esac

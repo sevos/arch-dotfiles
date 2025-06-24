@@ -1,0 +1,23 @@
+// Intel GPU Display Configuration for PEON
+// This file contains output configuration for Intel GPU mode
+// HDMI output connected to Intel UHD Graphics 770
+
+// Configure Intel GPU output (HDMI)
+output "HDMI-A-2" {
+    // Use the preferred mode
+    mode "3840x2160@59.997"
+
+    // Scale for HiDPI (same as NVIDIA for consistency)
+    scale 2
+
+    // Transform allows to rotate the output counter-clockwise
+    transform "normal"
+
+    // Position in global coordinate space (same as NVIDIA for seamless switching)
+    position x=0 y=0
+}
+
+// Disable NVIDIA GPU output (DisplayPort) when using Intel
+output "DP-2" {
+    off
+}

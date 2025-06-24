@@ -1,0 +1,23 @@
+// NVIDIA GPU Display Configuration for PEON
+// This file contains output configuration for NVIDIA GPU mode
+// DisplayPort output connected to NVIDIA RTX 3060
+
+// Configure NVIDIA GPU output (DisplayPort)
+output "DP-2" {
+    // Resolution and refresh rate
+    mode "3840x2160@144.050"
+
+    // Scale for HiDPI
+    scale 2
+
+    // Transform allows to rotate the output counter-clockwise
+    transform "normal"
+
+    // Position in global coordinate space
+    position x=0 y=0
+}
+
+// Disable Intel GPU output (HDMI) when using NVIDIA
+output "HDMI-A-2" {
+    off
+}
