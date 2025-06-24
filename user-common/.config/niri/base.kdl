@@ -401,7 +401,7 @@ binds {
     Mod+B hotkey-overlay-title="Open Google Chrome" { spawn "bash" "-c" "DISPLAY=:0 exec google-chrome-stable --profile-directory='Default' $CHROME_FLAGS"; }
     Mod+Shift+B hotkey-overlay-title="Open Google Chrome" { spawn "bash" "-c" "DISPLAY=:0 exec google-chrome-stable $CHROME_FLAGS"; }
     Mod+E hotkey-overlay-title="Open File Manager: Thunar" { spawn "thunar"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock" "--screenshots" "--effect-blur" "7x5" "--effect-vignette" "0.5:0.5" "--ring-color" "7fc8ff" "--key-hl-color" "ffffff" "--line-color" "00000000" "--inside-color" "00000088" "--separator-color" "00000000" "--grace" "2" "--fade-in" "0.2"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "bash" "-c" "$HOME/.local/bin/lock-session.sh"; }
     Mod+Shift+W hotkey-overlay-title="Change Wallpaper: nitrogen" { spawn "bash" "-c" "DISPLAY=:0 nitrogen"; }
 
     // GPU switching keybind (PEON only - will be no-op on other machines)
