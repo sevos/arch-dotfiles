@@ -1,5 +1,6 @@
 google-chrome
 1password
+1password-cli
 slack-desktop-wayland
 visual-studio-code-bin
 swaylock-effects
