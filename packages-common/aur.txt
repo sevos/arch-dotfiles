@@ -7,3 +7,4 @@ swaylock-effects
 zapzap
 wlogout
 system-config-printer
+ydotool

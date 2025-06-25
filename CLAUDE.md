@@ -104,6 +104,29 @@ GNU Stow-based dotfiles management for Arch Linux systems with multi-machine sup
 - Test on clean Arch installations before deployment
 - Follow Arch Linux best practices and wiki recommendations
 
+### Post-Install Script Structure
+Post-install scripts must follow this pattern:
+```bash
+#!/bin/bash
+# Script description
+
+set -e
+
+# Get the dotfiles directory (going up two levels from post-install.d)
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Source the shared logging library
+source "$DOTFILES_DIR/lib/logging.sh"
+
+# Use these logging functions:
+# info "message"        - General information
+# success "message"     - Success confirmation
+# error "message"       - Error messages
+# warn "message"        - Warning messages
+# substep "message"     - Sub-operation details
+# processing "message"  - Long-running operation indicator
+```
+
 ### Package Management Rules
 - Package lists: one package per line, **no comments allowed**
 - Never add comments to aur.txt or pacman.txt files

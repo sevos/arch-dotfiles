@@ -27,3 +27,5 @@ export TERMINAL=alacritty
 # Editor
 export EDITOR=nano
 export VISUAL=nano
+# ydotool socket configuration
+export YDOTOOL_SOCKET="/run/user/1000/.ydotool_socket"
