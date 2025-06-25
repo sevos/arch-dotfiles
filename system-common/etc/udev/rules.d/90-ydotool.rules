@@ -1,0 +1,3 @@
+# Allow access to uinput device for ydotool functionality
+# Users in the input group can access /dev/uinput for virtual input device creation
+KERNEL=="uinput", GROUP="input", MODE="0660"

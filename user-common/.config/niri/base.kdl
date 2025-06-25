@@ -648,8 +648,11 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 
-    // Toggle Waystt recording and paste result
-    Mod+Less hotkey-overlay-title="Toggle Waystt Recording" { spawn "bash" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || /home/sevos/Projects/waystt/target/release/waystt --envfile /home/sevos/Projects/waystt/.env &"; }
+    // waystt - Speech to Text (direct typing)
+    Mod+Less hotkey-overlay-title="waystt Speech to Text" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || (cd ~/.config/waystt && ~/.local/bin/waystt &)"; }
+    
+    // waystt - Speech to Text (clipboard copy)
+    Mod+Shift+Less hotkey-overlay-title="waystt to Clipboard" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR2 waystt || (cd ~/.config/waystt && ~/.local/bin/waystt &)"; }
 
     // Open power menu with wlogout
     Mod+Shift+Escape { spawn "wlogout"; }
