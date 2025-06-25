@@ -19,7 +19,7 @@ fi
 source "$DOTFILES_DIR/lib/logging.sh"
 
 # Initialize logging with total steps: update+multilib, packages-common, packages-hostname, aur-common, aur-hostname, stow-common, stow-hostname, post-install-common, post-install-hostname
-init_logging 9
+init_logging 10
 
 debug "sync-system.sh started successfully"
 
@@ -62,10 +62,18 @@ cleanup_orphaned_dotfiles_links() {
     # Find broken symlinks and check if they point to our dotfiles directory
     # Use timeout to prevent hanging
     local temp_file=$(mktemp)
-    # Skip directories that are likely to have many files or cause issues
-    local exclude_paths="-path /.snapshots -prune -o -path /proc -prune -o -path /sys -prune -o -path /dev -prune -o -path /run -prune -o -path /tmp -prune -o -path /var/cache -prune -o -path /var/lib -prune -o"
+    # Only search directories where dotfiles creates symlinks
+    local search_dirs=("/etc" "/usr" "/post-install.d")
     
-    if timeout 60 find "$target_dir" $exclude_paths -type l -print0 2>/dev/null > "$temp_file"; then
+    # Build find command for specific directories only
+    local find_cmd=()
+    for dir in "${search_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            find_cmd+=("$dir")
+        fi
+    done
+    
+    if [[ ${#find_cmd[@]} -gt 0 ]] && timeout 60 find "${find_cmd[@]}" -type l -print0 2>/dev/null > "$temp_file"; then
         while IFS= read -r -d '' link; do
             if [[ -L "$link" && ! -e "$link" ]]; then
                 local link_target
@@ -415,8 +423,7 @@ run_post_install_scripts() {
 step "Running common post-install scripts"
 run_post_install_scripts "system-common/post-install.d" "common system"
 
-# Update step count for machine-specific scripts
-TOTAL_STEPS=9
+# Step 10: Run machine-specific post-install scripts
 step "Running $HOSTNAME-specific post-install scripts"
 run_post_install_scripts "system-$HOSTNAME/post-install.d" "$HOSTNAME system"
 
