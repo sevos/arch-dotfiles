@@ -9,27 +9,35 @@ echo "Configuring 1Password CLI..."
 
 # Check if op binary exists
 if ! command -v op &> /dev/null; then
-    echo "Warning: 1Password CLI (op) not found. Make sure to run sync-system.sh first."
+    echo "Warning: 1Password CLI (op) not found. Make sure to install it via packages first."
     exit 0
 fi
 
 # Create onepassword-cli group if it doesn't exist
 if ! getent group onepassword-cli &> /dev/null; then
     echo "Creating onepassword-cli group..."
-    sudo groupadd onepassword-cli
+    groupadd onepassword-cli
 fi
 
 # Add current user to onepassword-cli group if not already a member
-if ! groups "$USER" | grep -q onepassword-cli; then
-    echo "Adding $USER to onepassword-cli group..."
-    sudo usermod -aG onepassword-cli "$USER"
+if [[ -n "${SUDO_USER:-}" ]]; then
+    # Running under sudo, use SUDO_USER
+    TARGET_USER="$SUDO_USER"
+else
+    # Fallback to current user (shouldn't happen in system sync)
+    TARGET_USER="$USER"
+fi
+
+if ! groups "$TARGET_USER" | grep -q onepassword-cli; then
+    echo "Adding $TARGET_USER to onepassword-cli group..."
+    usermod -aG onepassword-cli "$TARGET_USER"
 fi
 
 # Set proper permissions on op binary
 OP_PATH=$(which op)
 echo "Setting permissions on $OP_PATH..."
-sudo chgrp onepassword-cli "$OP_PATH"
-sudo chmod g+s "$OP_PATH"
+chgrp onepassword-cli "$OP_PATH"
+chmod g+s "$OP_PATH"
 
 echo "1Password CLI setup completed!"
 echo
