@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# ydotool Polish keyboard wrapper
+# Uses AltGr combinations for Polish diacritics (standard Polish keyboard layout)
+
+# Check if ydotool service is running
+if ! systemctl --user is-active --quiet ydotool.service; then
+    echo "Error: ydotool service is not running" >&2
+    exit 1
+fi
+
+# Key codes for Polish characters using AltGr (Right Alt = 100)
+# Based on standard Polish keyboard layout
+polish_char_map() {
+    local char="$1"
+    case "$char" in
+        "ą") echo "100:1 30:1 30:0 100:0" ;;   # AltGr+a
+        "ć") echo "100:1 46:1 46:0 100:0" ;;   # AltGr+c  
+        "ę") echo "100:1 18:1 18:0 100:0" ;;   # AltGr+e
+        "ł") echo "100:1 38:1 38:0 100:0" ;;   # AltGr+l
+        "ń") echo "100:1 49:1 49:0 100:0" ;;   # AltGr+n
+        "ó") echo "100:1 24:1 24:0 100:0" ;;   # AltGr+o
+        "ś") echo "100:1 31:1 31:0 100:0" ;;   # AltGr+s
+        "ź") echo "100:1 44:1 44:0 100:0" ;;   # AltGr+z
+        "ż") echo "100:1 45:1 45:0 100:0" ;;   # AltGr+x
+        "Ą") echo "100:1 42:1 30:1 30:0 42:0 100:0" ;;  # AltGr+Shift+a
+        "Ć") echo "100:1 42:1 46:1 46:0 42:0 100:0" ;;  # AltGr+Shift+c
+        "Ę") echo "100:1 42:1 18:1 18:0 42:0 100:0" ;;  # AltGr+Shift+e
+        "Ł") echo "100:1 42:1 38:1 38:0 42:0 100:0" ;;  # AltGr+Shift+l
+        "Ń") echo "100:1 42:1 49:1 49:0 42:0 100:0" ;;  # AltGr+Shift+n
+        "Ó") echo "100:1 42:1 24:1 24:0 42:0 100:0" ;;  # AltGr+Shift+o
+        "Ś") echo "100:1 42:1 31:1 31:0 42:0 100:0" ;;  # AltGr+Shift+s
+        "Ź") echo "100:1 42:1 44:1 44:0 42:0 100:0" ;;  # AltGr+Shift+z
+        "Ż") echo "100:1 42:1 45:1 45:0 42:0 100:0" ;;  # AltGr+Shift+x
+        *) return 1 ;;
+    esac
+}
+
+# Function to type text with Polish character support
+type_with_polish() {
+    local text="$1"
+    local i=0
+    
+    while [ $i -lt ${#text} ]; do
+        local char="${text:$i:1}"
+        local key_seq
+        
+        if key_seq=$(polish_char_map "$char"); then
+            # Type Polish character using key sequence
+            /usr/bin/ydotool key $key_seq
+            sleep 0.02
+        else
+            # Type regular character
+            printf "%c" "$char" | /usr/bin/ydotool type -f - -d 5
+        fi
+        
+        i=$((i + 1))
+    done
+}
+
+# Main script logic
+case "${1:-}" in
+    "type")
+        shift
+        if [ $# -eq 0 ]; then
+            echo "Error: No text provided" >&2
+            exit 1
+        fi
+        type_with_polish "$*"
+        ;;
+    "help"|"--help"|"-h")
+        echo "Usage: ydotool type <text>"
+        echo "ydotool wrapper with Polish diacritics support"
+        echo ""
+        echo "Supported Polish characters: ąćęłńóśźż ĄĆĘŁŃÓŚŹŻ"
+        echo "Falls back to original ydotool for other commands"
+        ;;
+    *)
+        # Pass through all other commands to original ydotool
+        /usr/bin/ydotool "$@"
+        ;;
+esac
