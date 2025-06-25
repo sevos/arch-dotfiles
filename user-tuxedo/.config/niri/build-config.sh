@@ -6,7 +6,9 @@ set -euo pipefail
 
 # Get the directory this script is in
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BASE_CONFIG="$SCRIPT_DIR/../../user-common/.config/niri/base.kdl"
+# Find the dotfiles directory - this script could be stowed or in the repo
+DOTFILES_DIR="$HOME/.dotfiles"
+BASE_CONFIG="$DOTFILES_DIR/user-common/.config/niri/base.kdl"
 TUXEDO_CONFIG="$SCRIPT_DIR/tuxedo-outputs.kdl"
 OUTPUT_CONFIG="$SCRIPT_DIR/config.kdl"
 
