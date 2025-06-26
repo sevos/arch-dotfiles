@@ -1,9 +1,7 @@
 // Tuxedo Display Configuration
 // This file contains output configuration for Tuxedo laptop
-// Standard laptop display setup - modify as needed for actual tuxedo hardware
 
 // Configure built-in laptop display (typical eDP-1 for laptops)
-// Note: Update this configuration based on actual tuxedo display specs
 output "eDP-1" {
     // Use preferred mode for laptop display
     // mode "1920x1080@60.000"
@@ -15,9 +13,16 @@ output "eDP-1" {
     position x=0 y=0
 }
 
-// If tuxedo has external display support, configure additional outputs here
-// Example for external monitor:
-// output "HDMI-A-1" {
-//     mode "1920x1080@60.000"
-//     position x=1920 y=0
-// }
+// Configure external HDMI display
+output "HDMI-A-1" {
+    // Use preferred mode - will auto-detect if not specified  
+    // mode "3840x2160@59.997"
+    position x=1706 y=0
+}
+
+// Window rule for wl-mirror to open on HDMI-A-1 display by default
+window-rule {
+    match app-id="at.yrlf.wl_mirror"
+    open-on-output "HDMI-A-1"
+    open-fullscreen true
+}

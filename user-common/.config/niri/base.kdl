@@ -656,6 +656,9 @@ binds {
 
     // Open power menu with wlogout
     Mod+Shift+Escape { spawn "wlogout"; }
+
+    // Toggle wl-mirror (Tuxedo specific)
+    Mod+Shift+M hotkey-overlay-title="Toggle wl-mirror" { spawn "bash" "-c" "pgrep -x wl-mirror >/dev/null && pkill wl-mirror || wl-mirror eDP-1"; }
 }
 
 // Layer rules for special surfaces like wlogout
