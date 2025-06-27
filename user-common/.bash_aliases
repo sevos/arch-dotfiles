@@ -21,7 +21,7 @@ alias g='git'
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
-alias gcauto='git commit -m "$(claude -p --dangerously-skip-permissions "Generate a commit message following conventional commit style based on this context:
+alias autocommit='git commit -m "$(claude -p --dangerously-skip-permissions "Generate a commit message following conventional commit style based on this context:
 
 STAGED FILES:
 $(git diff --cached --name-only)
