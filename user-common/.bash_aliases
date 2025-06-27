@@ -21,7 +21,18 @@ alias g='git'
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
-alias gcauto='git commit -m "$(claude -p --dangerously-skip-permissions "analyze the currently staged git changes and generate only a commit message following this repo'\''s conventional commit style. Output only the commit message, nothing else.")"'
+alias gcauto='git commit -m "$(claude -p --dangerously-skip-permissions "Generate a commit message following conventional commit style based on this context:
+
+STAGED FILES:
+$(git diff --cached --name-only)
+
+DIFF:
+$(git diff --cached)
+
+RECENT COMMIT MESSAGES (last 3):
+$(git log --oneline -3)
+
+Output only the commit message, nothing else.")"'
 alias gp='git push'
 alias gl='git pull'
 alias gd='git diff'
