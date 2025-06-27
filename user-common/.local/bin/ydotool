@@ -62,17 +62,39 @@ type_with_polish() {
 case "${1:-}" in
     "type")
         shift
-        if [ $# -eq 0 ]; then
+        
+        # Handle --file - option (read from stdin)
+        if [ "$1" = "--file" ] && [ "$2" = "-" ]; then
+            # Read all input from stdin
+            local input_text
+            input_text=$(cat)
+            if [ -n "$input_text" ]; then
+                type_with_polish "$input_text"
+            fi
+        # Handle -f - option (short form)
+        elif [ "$1" = "-f" ] && [ "$2" = "-" ]; then
+            # Read all input from stdin
+            local input_text
+            input_text=$(cat)
+            if [ -n "$input_text" ]; then
+                type_with_polish "$input_text"
+            fi
+        # Handle direct text arguments
+        elif [ $# -eq 0 ]; then
             echo "Error: No text provided" >&2
             exit 1
+        else
+            type_with_polish "$*"
         fi
-        type_with_polish "$*"
         ;;
     "help"|"--help"|"-h")
         echo "Usage: ydotool type <text>"
+        echo "       ydotool type --file -"
+        echo "       ydotool type -f -"
         echo "ydotool wrapper with Polish diacritics support"
         echo ""
         echo "Supported Polish characters: ąćęłńóśźż ĄĆĘŁŃÓŚŹŻ"
+        echo "Use --file - or -f - to read text from stdin"
         echo "Falls back to original ydotool for other commands"
         ;;
     *)
