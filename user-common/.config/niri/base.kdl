@@ -649,10 +649,10 @@ binds {
     Mod+Shift+P { power-off-monitors; }
 
     // waystt - Speech to Text (direct typing)
-    Mod+Less hotkey-overlay-title="waystt Speech to Text" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || (cd ~/.config/waystt && ~/.local/bin/waystt &)"; }
+    Mod+Less hotkey-overlay-title="waystt Speech to Text" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || waystt &"; }
     
     // waystt - Speech to Text (clipboard copy)
-    Mod+Shift+Less hotkey-overlay-title="waystt to Clipboard" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR2 waystt || (cd ~/.config/waystt && ~/.local/bin/waystt &)"; }
+    Mod+Shift+Less hotkey-overlay-title="waystt to Clipboard" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR2 waystt || waystt &"; }
 
     // Open power menu with wlogout
     Mod+Shift+Escape { spawn "wlogout"; }
