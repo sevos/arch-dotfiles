@@ -1,0 +1,6 @@
+{
+	"batchinstall": true,
+	"maxconcurrentdownloads": 5,
+	"combinedupgrade": false,
+	"rebuild": "no"
+}

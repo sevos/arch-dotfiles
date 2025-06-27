@@ -214,10 +214,10 @@ if command -v yay &> /dev/null; then
             
             if [[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]]; then
                 info "AUR packages: $packages"
-                yay -Syu --needed --noconfirm $packages || die "Failed to install common AUR packages"
+                yay -S --needed --noconfirm $packages || die "Failed to install common AUR packages"
             else
                 temp_output=$(mktemp)
-                if yay -Syu --needed --noconfirm $packages > "$temp_output" 2>&1; then
+                if yay -S --needed --noconfirm $packages > "$temp_output" 2>&1; then
                     installed=$(grep -E "installing|upgrading" "$temp_output" 2>/dev/null | wc -l || echo "0")
                     up_to_date=$(grep "is up to date" "$temp_output" 2>/dev/null | wc -l || echo "0")
                     package_summary "$package_count" "$installed" "0" "$up_to_date"
@@ -249,10 +249,10 @@ if command -v yay &> /dev/null; then
             
             if [[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]]; then
                 info "AUR packages: $packages"
-                yay -Syu --needed --noconfirm $packages || die "Failed to install $HOSTNAME-specific AUR packages"
+                yay -S --needed --noconfirm $packages || die "Failed to install $HOSTNAME-specific AUR packages"
             else
                 temp_output=$(mktemp)
-                if yay -Syu --needed --noconfirm $packages > "$temp_output" 2>&1; then
+                if yay -S --needed --noconfirm $packages > "$temp_output" 2>&1; then
                     installed=$(grep -E "installing|upgrading" "$temp_output" 2>/dev/null | wc -l || echo "0")
                     up_to_date=$(grep "is up to date" "$temp_output" 2>/dev/null | wc -l || echo "0")
                     package_summary "$package_count" "$installed" "0" "$up_to_date"
