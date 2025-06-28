@@ -63,6 +63,7 @@ fzf
 zoxide
 lazygit
 jq
+yq
 neovim
 linux-headers
 nodejs
