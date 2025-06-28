@@ -8,7 +8,8 @@ lock '$HOME/.local/bin/lock-session.sh'
 before-sleep '$HOME/.local/bin/lock-session.sh'
 
 # Auto-lock after 10 minutes of inactivity
-timeout 600 '$HOME/.local/bin/lock-session.sh'
+# Use loginctl lock-session which is non-blocking and properly handled by the 'lock' event
+timeout 600 'loginctl lock-session'
 
 # Turn off displays after 12 minutes of inactivity  
 timeout 720 'niri msg action power-off-monitors' resume 'niri msg action power-on-monitors'
