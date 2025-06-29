@@ -651,8 +651,8 @@ binds {
     // waystt - Speech to Text (direct typing)
     Mod+Less hotkey-overlay-title="waystt Speech to Text" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || waystt --pipe-to ydotool type --file -"; }
     
-    // wl-assistant
-    Mod+Shift+Less hotkey-overlay-title="Launch wl-assistant" { spawn "~/Projects/wl-assistant/wl-assistant.sh"; }
+    // wl-assistant with OPENAI_API_KEY from .env file
+    Mod+Shift+Less hotkey-overlay-title="Launch wl-assistant" { spawn "bash" "-c" "export $(grep '^OPENAI_API_KEY=' ~/.config/waystt/.env) && ~/Projects/wl-assistant/wl-assistant.sh"; }
 
     // Open power menu with wlogout
     Mod+Shift+Escape { spawn "wlogout"; }
