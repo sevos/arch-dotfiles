@@ -648,11 +648,11 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 
-    // waystt - Speech to Text (direct typing)
-    Mod+Less hotkey-overlay-title="waystt Speech to Text" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || waystt --pipe-to ydotool type --file -"; }
-    
     // wl-assistant with OPENAI_API_KEY from .env file
-    Mod+Shift+Less hotkey-overlay-title="Launch wl-assistant" { spawn "bash" "-c" "export $(grep '^OPENAI_API_KEY=' ~/.config/waystt/.env) && ~/Projects/wl-assistant/wl-assistant.sh"; }
+    Mod+Less hotkey-overlay-title="Launch wl-assistant" { spawn "bash" "-c" "export $(grep '^OPENAI_API_KEY=' ~/.config/waystt/.env) && ~/Projects/wl-assistant/wl-assistant.sh"; }
+    
+    // waystt - Speech to Text (direct typing)
+    Mod+Shift+Less hotkey-overlay-title="waystt Speech to Text" { spawn "sh" "-c" "pgrep -x waystt >/dev/null && pkill -USR1 waystt || waystt --pipe-to ydotool type --file -"; }
 
     // Open power menu with wlogout
     Mod+Shift+Escape { spawn "wlogout"; }
