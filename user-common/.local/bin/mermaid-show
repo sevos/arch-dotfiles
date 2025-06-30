@@ -1,0 +1,498 @@
+#!/bin/bash
+# mermaid-show - Display Mermaid diagrams inline in Kitty terminal
+# Usage: mermaid-show [options] [input]
+
+set -e
+
+# Script configuration
+SCRIPT_NAME="mermaid-show"
+SCRIPT_VERSION="1.0.0"
+CONFIG_DIR="$HOME/.config/mermaid-show"
+CONFIG_FILE="$CONFIG_DIR/config"
+CACHE_DIR="$HOME/.cache/mermaid-show"
+TEMP_DIR="/tmp/mermaid-show-$$"
+
+# Default configuration
+DEFAULT_THEME="dark"
+DEFAULT_BACKGROUND="transparent"
+DEFAULT_SIZE="1600x1200"
+DEFAULT_FORMAT="png"
+VERBOSE=false
+FORCE_INSTALL=false
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    if [[ "$VERBOSE" == "true" ]]; then
+        echo -e "${BLUE}[INFO]${NC} $1" >&2
+    fi
+}
+
+log_success() {
+    if [[ "$VERBOSE" == "true" ]]; then
+        echo -e "${GREEN}[SUCCESS]${NC} $1" >&2
+    fi
+}
+
+log_warning() {
+    if [[ "$VERBOSE" == "true" ]]; then
+        echo -e "${YELLOW}[WARNING]${NC} $1" >&2
+    fi
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+# Cleanup function
+cleanup() {
+    if [[ -d "$TEMP_DIR" ]]; then
+        # Add a small delay for kitty to process the image
+        sleep 0.5
+        rm -rf "$TEMP_DIR"
+        log_info "Cleaned up temporary directory: $TEMP_DIR"
+    fi
+}
+
+# Set up cleanup trap
+trap cleanup EXIT
+
+# Show help
+show_help() {
+    cat << EOF
+$SCRIPT_NAME v$SCRIPT_VERSION - Display Mermaid diagrams inline in Kitty terminal
+
+USAGE:
+    $SCRIPT_NAME [OPTIONS] [INPUT]
+
+INPUTS:
+    [INPUT]         Mermaid diagram file path, direct syntax, or stdin if omitted
+    
+OPTIONS:
+    -t, --theme THEME       Set theme (default: $DEFAULT_THEME)
+                           Options: default, neutral, dark, forest, base
+    -s, --size WIDTHxHEIGHT Set output size (default: $DEFAULT_SIZE)
+    -b, --background COLOR  Set background color (default: $DEFAULT_BACKGROUND)
+    -f, --format FORMAT     Output format (default: $DEFAULT_FORMAT)
+                           Options: png, svg, pdf
+    -v, --verbose           Enable verbose output
+    --force-install         Force reinstallation of dependencies
+    --install-deps          Install missing dependencies without prompting
+    -h, --help              Show this help message
+
+EXAMPLES:
+    echo "graph TD; A-->B;" | $SCRIPT_NAME
+    $SCRIPT_NAME diagram.mmd
+    $SCRIPT_NAME "graph LR; Start-->End;"
+    $SCRIPT_NAME --theme forest --size 1200x800 diagram.mmd
+    $SCRIPT_NAME --background white "sequenceDiagram; A->>B: Hello"
+
+CONFIGURATION:
+    Config file: $CONFIG_FILE
+    Cache dir: $CACHE_DIR
+    
+EOF
+}
+
+# Load configuration
+load_config() {
+    mkdir -p "$CONFIG_DIR" "$CACHE_DIR"
+    
+    if [[ -f "$CONFIG_FILE" ]]; then
+        source "$CONFIG_FILE"
+        log_info "Loaded configuration from $CONFIG_FILE"
+    else
+        # Create default config
+        cat > "$CONFIG_FILE" << EOF
+# mermaid-show configuration file
+DEFAULT_THEME="$DEFAULT_THEME"
+DEFAULT_BACKGROUND="$DEFAULT_BACKGROUND"
+DEFAULT_SIZE="$DEFAULT_SIZE"
+DEFAULT_FORMAT="$DEFAULT_FORMAT"
+EOF
+        log_info "Created default configuration at $CONFIG_FILE"
+    fi
+}
+
+# Check if we're running in Kitty terminal
+check_kitty() {
+    if [[ -z "$KITTY_WINDOW_ID" ]]; then
+        log_warning "Not running in Kitty terminal. Image display may not work properly."
+        log_warning "Consider switching to Kitty terminal for best experience."
+        return 1
+    fi
+    log_info "Kitty terminal detected"
+    return 0
+}
+
+# Check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Check and install Node.js
+check_install_node() {
+    local cache_file="$CACHE_DIR/node_checked"
+    
+    if [[ -f "$cache_file" ]] && [[ "$FORCE_INSTALL" != "true" ]]; then
+        log_info "Node.js check cached (use --force-install to recheck)"
+        return 0
+    fi
+    
+    if command_exists node && command_exists npm; then
+        local node_version=$(node --version)
+        log_success "Node.js found: $node_version"
+        touch "$cache_file"
+        return 0
+    fi
+    
+    log_error "Node.js not found!"
+    echo "Please install Node.js using one of these methods:"
+    echo "  1. System package manager: sudo pacman -S nodejs npm"
+    echo "  2. Version manager (mise): mise install node@latest"
+    echo "  3. Direct download: https://nodejs.org/"
+    return 1
+}
+
+# Check and install mermaid-cli
+check_install_mermaid() {
+    local cache_file="$CACHE_DIR/mermaid_checked"
+    
+    if [[ -f "$cache_file" ]] && [[ "$FORCE_INSTALL" != "true" ]]; then
+        if command_exists mmdc; then
+            log_info "Mermaid CLI check cached"
+            return 0
+        else
+            # Cache is stale, remove it
+            rm -f "$cache_file"
+        fi
+    fi
+    
+    if command_exists mmdc; then
+        local mermaid_version=$(mmdc --version)
+        log_success "Mermaid CLI found: $mermaid_version"
+        touch "$cache_file"
+        return 0
+    fi
+    
+    log_warning "Mermaid CLI not found. Installing..."
+    
+    # Try to install mermaid-cli globally
+    if ! npm install -g @mermaid-js/mermaid-cli; then
+        log_error "Failed to install mermaid-cli globally"
+        echo "You may need to:"
+        echo "  1. Fix npm permissions: npm config set prefix ~/.local"
+        echo "  2. Use sudo: sudo npm install -g @mermaid-js/mermaid-cli"
+        echo "  3. Install locally: npm install @mermaid-js/mermaid-cli"
+        return 1
+    fi
+    
+    # Verify installation
+    if command_exists mmdc; then
+        log_success "Mermaid CLI installed successfully"
+        touch "$cache_file"
+        return 0
+    else
+        log_error "Mermaid CLI installation failed"
+        return 1
+    fi
+}
+
+# Install system dependencies
+install_system_deps() {
+    local missing_packages=()
+    
+    # Check for ImageMagick (for format conversion)
+    if ! command_exists convert; then
+        missing_packages+=("imagemagick")
+    fi
+    
+    # Check for chromium/chrome (required by mermaid-cli)
+    if ! command_exists chromium && ! command_exists google-chrome && ! command_exists google-chrome-stable && ! command_exists chromium-browser; then
+        missing_packages+=("chromium")
+    fi
+    
+    if [[ ${#missing_packages[@]} -gt 0 ]]; then
+        log_warning "Missing system packages: ${missing_packages[*]}"
+        echo "Please install them with: sudo pacman -S ${missing_packages[*]}"
+        
+        if [[ "$FORCE_INSTALL" == "true" ]]; then
+            read -p "Install now? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                sudo pacman -S "${missing_packages[@]}"
+            fi
+        fi
+    fi
+}
+
+# Validate dependencies
+validate_dependencies() {
+    log_info "Validating dependencies..."
+    
+    local deps_ok=true
+    
+    if ! check_install_node; then
+        deps_ok=false
+    fi
+    
+    if ! check_install_mermaid; then
+        deps_ok=false
+    fi
+    
+    install_system_deps
+    
+    if [[ "$deps_ok" != "true" ]]; then
+        log_error "Dependency validation failed"
+        return 1
+    fi
+    
+    log_success "All dependencies validated"
+    return 0
+}
+
+# Detect input type and content
+get_input_content() {
+    local input="$1"
+    local content=""
+    
+    if [[ -z "$input" ]]; then
+        # Read from stdin
+        if [[ -t 0 ]]; then
+            log_error "No input provided and stdin is empty"
+            echo "Usage: $SCRIPT_NAME [options] [input]"
+            echo "Run '$SCRIPT_NAME --help' for more information"
+            return 1
+        fi
+        content=$(cat)
+        log_info "Input from stdin"
+    elif [[ -f "$input" ]]; then
+        # Input is a file
+        content=$(cat "$input")
+        log_info "Input from file: $input"
+    else
+        # Input is direct mermaid syntax
+        content="$input"
+        log_info "Input is direct mermaid syntax"
+    fi
+    
+    if [[ -z "$content" ]]; then
+        log_error "Empty input content"
+        return 1
+    fi
+    
+    echo "$content"
+    return 0
+}
+
+# Validate mermaid syntax
+validate_mermaid_syntax() {
+    local content="$1"
+    
+    # Basic syntax validation
+    if [[ ! "$content" =~ (graph|flowchart|sequenceDiagram|classDiagram|gantt|gitGraph|pie|journey|quadrantChart|sankey) ]]; then
+        log_warning "Content may not be valid Mermaid syntax"
+        log_info "Content preview: ${content:0:100}..."
+    fi
+}
+
+# Generate mermaid diagram
+generate_diagram() {
+    local content="$1"
+    local theme="$2"
+    local background="$3"
+    local size="$4"
+    local format="$5"
+    
+    local input_file="$TEMP_DIR/input.mmd"
+    local output_file="$TEMP_DIR/output.$format"
+    local config_file="$TEMP_DIR/config.json"
+    
+    # Create temporary directory
+    mkdir -p "$TEMP_DIR"
+    
+    # Write input content
+    echo "$content" > "$input_file"
+    
+    # Create mermaid config
+    cat > "$config_file" << EOF
+{
+  "theme": "$theme",
+  "background": "$background",
+  "width": ${size%x*},
+  "height": ${size#*x},
+  "flowchart": {
+    "diagramPadding": 20,
+    "htmlLabels": true,
+    "curve": "basis"
+  }
+}
+EOF
+    
+    log_info "Generating diagram with theme: $theme, background: $background, size: $size"
+    
+    # Generate diagram
+    if ! mmdc -i "$input_file" -o "$output_file" -C "$config_file" --scale 2 --quiet; then
+        log_error "Failed to generate mermaid diagram"
+        log_error "Input content was: $content"
+        return 1
+    fi
+    
+    if [[ ! -f "$output_file" ]]; then
+        log_error "Output file not created: $output_file"
+        return 1
+    fi
+    
+    echo "$output_file"
+    return 0
+}
+
+# Display image in terminal
+display_image() {
+    local image_file="$1"
+    
+    if [[ ! -f "$image_file" ]]; then
+        log_error "Image file not found: $image_file"
+        return 1
+    fi
+    
+    log_info "Displaying image: $image_file"
+    
+    # Use Kitty's image display protocol
+    if command_exists kitty && [[ -n "$KITTY_WINDOW_ID" ]]; then
+        kitty +kitten icat "$image_file"
+    else
+        # Fallback methods
+        if command_exists imgcat; then
+            imgcat "$image_file"
+        elif command_exists chafa; then
+            chafa "$image_file"
+        elif command_exists jp2a; then
+            jp2a --colors "$image_file"
+        else
+            log_warning "No suitable image display method found"
+            echo "Generated image saved to: $image_file"
+            return 1
+        fi
+    fi
+    
+    return 0
+}
+
+# Main function
+main() {
+    local theme="$DEFAULT_THEME"
+    local background="$DEFAULT_BACKGROUND"
+    local size="$DEFAULT_SIZE"
+    local format="$DEFAULT_FORMAT"
+    local input=""
+    local install_deps=false
+    
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -t|--theme)
+                theme="$2"
+                shift 2
+                ;;
+            -s|--size)
+                size="$2"
+                shift 2
+                ;;
+            -b|--background)
+                background="$2"
+                shift 2
+                ;;
+            -f|--format)
+                format="$2"
+                shift 2
+                ;;
+            -v|--verbose)
+                VERBOSE=true
+                shift
+                ;;
+            --force-install)
+                FORCE_INSTALL=true
+                shift
+                ;;
+            --install-deps)
+                install_deps=true
+                shift
+                ;;
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -*)
+                log_error "Unknown option: $1"
+                echo "Run '$SCRIPT_NAME --help' for usage information"
+                exit 1
+                ;;
+            *)
+                if [[ -z "$input" ]]; then
+                    input="$1"
+                else
+                    log_error "Multiple input arguments provided"
+                    exit 1
+                fi
+                shift
+                ;;
+        esac
+    done
+    
+    # Load configuration
+    load_config
+    
+    # Check Kitty terminal (warning only)
+    check_kitty
+    
+    # Validate dependencies
+    if [[ "$install_deps" == "true" ]] || [[ "$FORCE_INSTALL" == "true" ]]; then
+        if ! validate_dependencies; then
+            exit 1
+        fi
+    else
+        if ! validate_dependencies; then
+            if [[ "$VERBOSE" == "true" ]]; then
+                echo
+                echo "Run with --install-deps to automatically install missing dependencies"
+            fi
+            exit 1
+        fi
+    fi
+    
+    # Get input content
+    local content
+    if ! content=$(get_input_content "$input"); then
+        exit 1
+    fi
+    
+    # Validate mermaid syntax
+    validate_mermaid_syntax "$content"
+    
+    # Generate diagram
+    local output_file
+    if ! output_file=$(generate_diagram "$content" "$theme" "$background" "$size" "$format"); then
+        exit 1
+    fi
+    
+    # Display the image
+    if ! display_image "$output_file"; then
+        log_warning "Failed to display image inline"
+        if [[ "$VERBOSE" == "true" ]]; then
+            echo "Generated diagram saved to: $output_file"
+            echo "You can open it manually or copy it to a permanent location"
+        fi
+    else
+        log_success "Diagram displayed successfully"
+    fi
+}
+
+# Run main function with all arguments
+main "$@"

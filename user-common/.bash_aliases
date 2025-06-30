@@ -64,3 +64,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Quick edit configs
 alias bashrc='$EDITOR ~/.bashrc'
 alias aliases='$EDITOR ~/.bash_aliases'
+
+# Mermaid diagram display
+alias mmd='mermaid-show'
+alias mermaid='mermaid-show'
