@@ -19,6 +19,8 @@ DEFAULT_SIZE="1600x1200"
 DEFAULT_FORMAT="png"
 VERBOSE=false
 FORCE_INSTALL=false
+OVERLAY_MODE=false
+DISPLAY_METHOD="auto"
 
 # Colors for output
 RED='\033[0;31m'
@@ -82,6 +84,12 @@ OPTIONS:
     -f, --format FORMAT     Output format (default: $DEFAULT_FORMAT)
                            Options: png, svg, pdf
     -v, --verbose           Enable verbose output
+    --overlay               Display diagram in overlay mode
+    --display METHOD        Display method (auto, inline, overlay, kitty-overlay)
+                           auto: Auto-detect best method
+                           inline: Standard inline display
+                           overlay: ueberzugpp overlay
+                           kitty-overlay: Kitty overlay window
     --force-install         Force reinstallation of dependencies
     --install-deps          Install missing dependencies without prompting
     -h, --help              Show this help message
@@ -92,6 +100,8 @@ EXAMPLES:
     $SCRIPT_NAME "graph LR; Start-->End;"
     $SCRIPT_NAME --theme forest --size 1200x800 diagram.mmd
     $SCRIPT_NAME --background white "sequenceDiagram; A->>B: Hello"
+    $SCRIPT_NAME --overlay "graph TD; A-->B;"
+    $SCRIPT_NAME --display kitty-overlay diagram.mmd
 
 CONFIGURATION:
     Config file: $CONFIG_FILE
@@ -204,6 +214,17 @@ check_install_mermaid() {
     fi
 }
 
+# Check ueberzugpp for overlay support
+check_ueberzugpp() {
+    if command_exists ueberzugpp; then
+        log_success "ueberzugpp found for overlay support"
+        return 0
+    else
+        log_warning "ueberzugpp not found. Overlay mode will not be available."
+        return 1
+    fi
+}
+
 # Install system dependencies
 install_system_deps() {
     local missing_packages=()
@@ -216,6 +237,11 @@ install_system_deps() {
     # Check for chromium/chrome (required by mermaid-cli)
     if ! command_exists chromium && ! command_exists google-chrome && ! command_exists google-chrome-stable && ! command_exists chromium-browser; then
         missing_packages+=("chromium")
+    fi
+    
+    # Check for ueberzugpp (for overlay support)
+    if ! command_exists ueberzugpp; then
+        missing_packages+=("ueberzugpp")
     fi
     
     if [[ ${#missing_packages[@]} -gt 0 ]]; then
@@ -353,8 +379,82 @@ EOF
     return 0
 }
 
-# Display image in terminal
-display_image() {
+# Display image using ueberzugpp overlay
+display_ueberzugpp_overlay() {
+    local image_file="$1"
+    local temp_script="$TEMP_DIR/ueberzug_script.sh"
+    
+    if [[ ! -f "$image_file" ]]; then
+        log_error "Image file not found: $image_file"
+        return 1
+    fi
+    
+    if ! command_exists ueberzugpp; then
+        log_error "ueberzugpp not found. Install with: sudo pacman -S ueberzugpp"
+        return 1
+    fi
+    
+    log_info "Displaying image with ueberzugpp overlay: $image_file"
+    
+    # Get terminal size
+    local term_width=$(tput cols)
+    local term_height=$(tput lines)
+    
+    # Calculate centered position (approximate)
+    local x=$((term_width / 4))
+    local y=$((term_height / 4))
+    local max_width=$((term_width / 2))
+    local max_height=$((term_height / 2))
+    
+    # Create a script to handle the overlay
+    cat > "$temp_script" << 'EOF'
+#!/bin/bash
+set -e
+
+IMAGE_FILE="$1"
+X="$2"
+Y="$3"
+MAX_WIDTH="$4"
+MAX_HEIGHT="$5"
+
+# Function to clean up and exit
+cleanup_and_exit() {
+    echo '{"action":"remove","identifier":"mermaid-preview"}' | ueberzugpp layer --parser json
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup_and_exit SIGINT SIGTERM
+
+# Display the image
+echo "{
+  \"action\": \"add\",
+  \"identifier\": \"mermaid-preview\",
+  \"path\": \"$IMAGE_FILE\",
+  \"x\": $X,
+  \"y\": $Y,
+  \"max_width\": $MAX_WIDTH,
+  \"max_height\": $MAX_HEIGHT
+}" | ueberzugpp layer --parser json &
+
+# Keep the overlay displayed and wait for user input
+echo "Mermaid diagram displayed in overlay. Press any key to close..."
+read -n 1 -s
+
+# Clean up
+cleanup_and_exit
+EOF
+    
+    chmod +x "$temp_script"
+    
+    # Run the overlay script
+    "$temp_script" "$image_file" "$x" "$y" "$max_width" "$max_height"
+    
+    return 0
+}
+
+# Display image using Kitty overlay window
+display_kitty_overlay() {
     local image_file="$1"
     
     if [[ ! -f "$image_file" ]]; then
@@ -362,23 +462,103 @@ display_image() {
         return 1
     fi
     
-    log_info "Displaying image: $image_file"
+    if [[ -z "$KITTY_WINDOW_ID" ]]; then
+        log_error "Not running in Kitty terminal. Kitty overlay requires Kitty."
+        return 1
+    fi
     
-    # Use Kitty's image display protocol
-    if command_exists kitty && [[ -n "$KITTY_WINDOW_ID" ]]; then
-        kitty +kitten icat "$image_file"
-    else
-        # Fallback methods
-        if command_exists imgcat; then
-            imgcat "$image_file"
-        elif command_exists chafa; then
-            chafa "$image_file"
-        elif command_exists jp2a; then
-            jp2a --colors "$image_file"
+    log_info "Displaying image in Kitty overlay window: $image_file"
+    
+    # Use Kitty's launch command to create a new window with the image
+    kitty @ launch --type=window --title="Mermaid Diagram" sh -c "
+        clear
+        echo 'Mermaid Diagram:'
+        echo '================'
+        echo
+        kitty +kitten icat '$image_file'
+        echo
+        echo 'Press any key to close this window...'
+        read -n 1 -s
+        exit
+    "
+    
+    return 0
+}
+
+# Auto-detect best display method
+detect_display_method() {
+    # Prefer Kitty overlay if in Kitty terminal
+    if [[ -n "$KITTY_WINDOW_ID" ]]; then
+        echo "kitty-overlay"
+        return 0
+    fi
+    
+    # Try ueberzugpp overlay if available
+    if command_exists ueberzugpp; then
+        echo "overlay"
+        return 0
+    fi
+    
+    # Fall back to inline
+    echo "inline"
+    return 0
+}
+
+# Display image in terminal
+display_image() {
+    local image_file="$1"
+    local method="$2"
+    
+    if [[ ! -f "$image_file" ]]; then
+        log_error "Image file not found: $image_file"
+        return 1
+    fi
+    
+    # Auto-detect method if not specified
+    if [[ "$method" == "auto" ]]; then
+        method=$(detect_display_method)
+        log_info "Auto-detected display method: $method"
+    fi
+    
+    case "$method" in
+        "overlay")
+            if display_ueberzugpp_overlay "$image_file"; then
+                return 0
+            else
+                log_warning "ueberzugpp overlay failed, falling back to inline"
+                method="inline"
+            fi
+            ;;
+        "kitty-overlay")
+            if display_kitty_overlay "$image_file"; then
+                return 0
+            else
+                log_warning "Kitty overlay failed, falling back to inline"
+                method="inline"
+            fi
+            ;;
+    esac
+    
+    # Inline display (original method)
+    if [[ "$method" == "inline" ]]; then
+        log_info "Displaying image inline: $image_file"
+        
+        # Use Kitty's image display protocol
+        if command_exists kitty && [[ -n "$KITTY_WINDOW_ID" ]]; then
+            kitty +kitten icat "$image_file"
         else
-            log_warning "No suitable image display method found"
-            echo "Generated image saved to: $image_file"
-            return 1
+            # Fallback methods
+            if command_exists imgcat; then
+                imgcat "$image_file"
+            elif command_exists chafa; then
+                chafa "$image_file"
+            elif command_exists jp2a; then
+                jp2a --colors "$image_file"
+            else
+                log_warning "No suitable image display method found"
+                echo "Generated image saved to: $image_file"
+                return 1
+            fi
         fi
     fi
     
@@ -417,6 +597,14 @@ main() {
                 VERBOSE=true
                 shift
                 ;;
+            --overlay)
+                DISPLAY_METHOD="overlay"
+                shift
+                ;;
+            --display)
+                DISPLAY_METHOD="$2"
+                shift 2
+                ;;
             --force-install)
                 FORCE_INSTALL=true
                 shift
@@ -452,6 +640,17 @@ main() {
     # Check Kitty terminal (warning only)
     check_kitty
     
+    # Validate display method
+    case "$DISPLAY_METHOD" in
+        "auto"|"inline"|"overlay"|"kitty-overlay")
+            ;; # Valid methods
+        *)
+            log_error "Invalid display method: $DISPLAY_METHOD"
+            echo "Valid methods: auto, inline, overlay, kitty-overlay"
+            exit 1
+            ;;
+    esac
+    
     # Validate dependencies
     if [[ "$install_deps" == "true" ]] || [[ "$FORCE_INSTALL" == "true" ]]; then
         if ! validate_dependencies; then
@@ -465,6 +664,11 @@ main() {
             fi
             exit 1
         fi
+    fi
+    
+    # Check overlay dependencies if needed
+    if [[ "$DISPLAY_METHOD" == "overlay" ]] || [[ "$DISPLAY_METHOD" == "auto" ]]; then
+        check_ueberzugpp
     fi
     
     # Get input content
@@ -483,14 +687,14 @@ main() {
     fi
     
     # Display the image
-    if ! display_image "$output_file"; then
-        log_warning "Failed to display image inline"
+    if ! display_image "$output_file" "$DISPLAY_METHOD"; then
+        log_warning "Failed to display image with method: $DISPLAY_METHOD"
         if [[ "$VERBOSE" == "true" ]]; then
             echo "Generated diagram saved to: $output_file"
             echo "You can open it manually or copy it to a permanent location"
         fi
     else
-        log_success "Diagram displayed successfully"
+        log_success "Diagram displayed successfully using: $DISPLAY_METHOD"
     fi
 }
 

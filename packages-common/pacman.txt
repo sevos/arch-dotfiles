@@ -88,3 +88,4 @@ avahi
 nss-mdns
 hplip
 clang
+ueberzugpp
