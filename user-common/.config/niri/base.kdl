@@ -250,8 +250,7 @@ spawn-at-startup "bash" "-c" "eval \"$(mise activate bash)\" && exec /home/sevos
 // Start xwayland-satellite for X11 app compatibility
 spawn-at-startup "xwayland-satellite"
 
-// Start Alacritty terminal at startup
-spawn-at-startup "alacritty"
+// Terminal removed from startup - launch manually with Mod+Return
 
 // Start Google Chrome at startup (after xwayland-satellite for X11 fallback)
 spawn-at-startup "bash" "-c" "sleep 2 && DISPLAY=:0 exec google-chrome-stable --profile-directory='Default' $CHROME_FLAGS"
@@ -351,6 +350,13 @@ window-rule {
     opacity 0.8
 }
 
+// Kitty: Set default width to 65% and 80% opacity (matching Alacritty)
+window-rule {
+    match app-id="kitty"
+    default-column-width { proportion 0.65; }
+    opacity 0.8
+}
+
 // Slack: Set default width to 55%
 window-rule {
     match app-id="Slack"
@@ -394,7 +400,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
+    Mod+Return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+Space  hotkey-overlay-title="Run an Application: fuzzel" { spawn "bash" "-c" "fuzzel --log-level info > ~/fuzzel.log 2>&1"; }
     Mod+Shift+Space hotkey-overlay-title="Switch window: fuzzel" { spawn "~/.config/niri/fuzzel-launcher.sh" "windows"; }
     Mod+Shift+C hotkey-overlay-title="Run Claude Desktop" { spawn "bash" "-c" "eval \"$(mise activate bash)\" && /home/sevos/AppImages/claude.appimage > ~/claude.log 2>&1"; }

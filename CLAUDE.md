@@ -160,8 +160,14 @@ source "$DOTFILES_DIR/lib/logging.sh"
 
 ### Common Configuration
 - **Display Manager**: greetd with regreet → `/etc/greetd/`
-- **Desktop**: Niri wayland compositor → `~/.config/niri/config.kdl`
+- **Desktop**: Niri wayland compositor → `user-common/.config/niri/base.kdl` (shared base config)
 - **Package Manager**: pacman + yay (AUR)
+
+### Niri Configuration Structure
+- **Base Configuration**: `user-common/.config/niri/base.kdl` - shared settings, keybindings, window rules
+- **Machine-Specific**: `user-{hostname}/.config/niri/` - GPU configs, output settings, build scripts
+- **Generated Config**: Machine-specific build scripts combine base + machine configs into final `config.kdl`
+- **Utilities**: `user-common/.config/niri/` contains wallpaper scripts and launchers
 
 ## Implementation Guidelines
 

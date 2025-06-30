@@ -11,6 +11,7 @@ fuzzel
 mako
 waybar
 alacritty
+kitty
 swaybg
 swayidle
 xwayland-satellite
