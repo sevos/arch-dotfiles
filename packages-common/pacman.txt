@@ -5,6 +5,7 @@ libadwaita
 mesa
 vulkan-radeon
 ttf-cascadia-code-nerd
+ttf-firacode-nerd
 cage
 niri
 fuzzel
