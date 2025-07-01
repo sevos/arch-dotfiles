@@ -9,3 +9,4 @@ wlogout
 system-config-printer
 ydotool
 waystt-bin
+gearlever
