@@ -2,13 +2,13 @@
 
 ## Language-Specific Context Loading
 
-**CRITICAL**: Before working with any code files, Claude MUST load language-specific development guidelines:
+**CRITICAL**: Before working with any code files, Claude MUST load language-specific development guidelines.
 
-- When working with `.ts`, `.tsx`, `.js`, `.jsx` files → Load `~/.claude/docs/developer/TYPESCRIPT.md`
-- When working with `.py` files → Load `~/.claude/docs/developer/PYTHON.md`
-- When working with `.rs` files → Load `~/.claude/docs/developer/RUST.md`
-- When working with `.go` files → Load `~/.claude/docs/developer/GO.md`
-- When working with `.java` files → Load `~/.claude/docs/developer/JAVA.md`
+### Available Language Documentation
+
+Currently available in `~/.claude/docs/developer/`:
+
+- **TYPESCRIPT.md** - TypeScript/JavaScript (.ts, .tsx, .js, .jsx files)
 
 Load the appropriate language context using the Read tool before making any code changes.
 
@@ -646,6 +646,20 @@ sequenceDiagram; User->>API: Request; API-->>User: Response
 ```bash
 mermaid-show --display kitty-overlay "graph TD; A-->B; B-->C;"
 ```
+
+## Program Execution Guidelines
+
+**Use Bash tool for:**
+- Quick commands that complete immediately: `npm test`, `git status`, `python script.py`
+- Build/install commands: `npm install`, `make build`
+- File operations and utilities
+
+**Use HT MCP tools for:**
+- Long-running processes: `npm run dev`, `python manage.py runserver`
+- Interactive TUI applications: `vim`, `htop`
+- Programs requiring session management or continuous monitoring
+
+Choose based on program behavior: immediate completion → Bash, persistent/interactive → HT MCP.
 
 ## Summary
 
