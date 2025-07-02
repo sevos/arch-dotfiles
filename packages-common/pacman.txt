@@ -92,3 +92,4 @@ clang
 ueberzugpp
 pdfcrack
 john
+hashcat
