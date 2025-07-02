@@ -90,3 +90,5 @@ nss-mdns
 hplip
 clang
 ueberzugpp
+pdfcrack
+john
