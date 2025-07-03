@@ -90,6 +90,8 @@ nss-mdns
 hplip
 clang
 ueberzugpp
+evince
+xournalpp
 pdfcrack
 john
 hashcat
