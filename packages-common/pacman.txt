@@ -96,3 +96,4 @@ pdfcrack
 john
 hashcat
 qgis
+qt5-wayland
