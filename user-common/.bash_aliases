@@ -70,4 +70,6 @@ alias mmd='mermaid-show'
 alias mermaid='mermaid-show'
 
 # Claude with dangerous permission skipping
-alias yolo='claude --dangerously-skip-permissions "$*"'
+yolo() {
+    claude --dangerously-skip-permissions "$*"
+}
