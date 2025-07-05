@@ -17,6 +17,12 @@ if command -v mmdc >/dev/null 2>&1; then
     exit 0
 fi
 
+# Source mise to ensure Node.js/npm are available
+if command -v mise >/dev/null 2>&1; then
+    substep "Activating mise environment"
+    eval "$(mise activate bash)"
+fi
+
 # Check if npm is available
 if ! command -v npm >/dev/null 2>&1; then
     error "npm not found. Please ensure Node.js and npm are installed first"

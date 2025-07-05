@@ -80,11 +80,32 @@ if [[ -f "$HOME/.bashrc" ]]; then
     rm "$HOME/.bashrc"
 fi
 
+# Handle mimeapps.list specially - it needs to be adopted if it conflicts
+handle_mimeapps_conflict() {
+    local mimeapps_target="$HOME/.config/mimeapps.list"
+    local mimeapps_source="$DOTFILES_DIR/user-common/.config/mimeapps.list"
+    
+    if [[ -f "$mimeapps_source" && -f "$mimeapps_target" && ! -L "$mimeapps_target" ]]; then
+        [[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]] && substep "Handling mimeapps.list conflict with --adopt"
+        # Create backup of existing file
+        cp "$mimeapps_target" "$mimeapps_target.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+        return 0  # Signal that we need to use --adopt for this stow operation
+    fi
+    return 1  # No conflict, proceed normally
+}
+
 # Step 2: Stow common user configurations
 step "Stowing common user configurations"
 if [[ -d "user-common" ]]; then
     [[ "$VERBOSITY_LEVEL" == "verbose" || "$VERBOSITY_LEVEL" == "debug" ]] && substep "Stowing common user configurations"
-    if stow -t "$HOME" --ignore='post-install.d' user-common; then
+    
+    # Check if we need to adopt mimeapps.list
+    adopt_flag=""
+    if handle_mimeapps_conflict; then
+        adopt_flag="--adopt"
+    fi
+    
+    if stow -t "$HOME" --ignore='post-install.d' $adopt_flag user-common; then
         success "Stowed common user configurations"
     else
         die "Failed to stow common user configurations"
