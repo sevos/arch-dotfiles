@@ -95,3 +95,4 @@ xournalpp
 pdfcrack
 john
 hashcat
+qgis

@@ -68,3 +68,6 @@ alias aliases='$EDITOR ~/.bash_aliases'
 # Mermaid diagram display
 alias mmd='mermaid-show'
 alias mermaid='mermaid-show'
+
+# Claude with dangerous permission skipping
+alias yolo='claude --dangerously-skip-permissions "$*"'
