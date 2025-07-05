@@ -1,0 +1,17 @@
+customCommands:
+  - key: 'A'
+    context: 'files'
+    command: 'git commit -m "$(claude -p --dangerously-skip-permissions "Generate a commit message following conventional commit style based on this context:
+
+STAGED FILES:
+$(git diff --cached --name-only)
+
+DIFF:
+$(git diff --cached)
+
+RECENT COMMIT MESSAGES (last 3):
+$(git log --oneline -3)
+
+Output only the commit message, nothing else.")"'
+    description: 'Auto-commit staged changes with Claude-generated message'
+    output: terminal
