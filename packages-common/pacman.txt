@@ -97,3 +97,7 @@ john
 hashcat
 qgis
 qt5-wayland
+noto-fonts
+noto-fonts-extra
+noto-fonts-cjk
+noto-fonts-emoji

@@ -61,3 +61,4 @@ application/json=code.desktop;
 text/markdown=code.desktop;
 text/x-yaml=code.desktop;
 application/x-yaml=code.desktop;
+application/pdf=com.google.Chrome.desktop;
