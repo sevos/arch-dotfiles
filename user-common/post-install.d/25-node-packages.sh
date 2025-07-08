@@ -25,3 +25,12 @@ else
     npm install -g @google/gemini-cli
     echo "Gemini CLI installed"
 fi
+
+# Check if md-tree command is available
+if command -v md-tree >/dev/null 2>&1; then
+    echo "md-tree is already installed"
+else
+    echo "Installing md-tree globally..."
+    npm install -g md-tree
+    echo "md-tree installed"
+fi
