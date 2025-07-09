@@ -31,6 +31,6 @@ if command -v md-tree >/dev/null 2>&1; then
     echo "md-tree is already installed"
 else
     echo "Installing md-tree globally..."
-    npm install -g md-tree
+    npm install -g @kayvan/markdown-tree-parser
     echo "md-tree installed"
 fi
