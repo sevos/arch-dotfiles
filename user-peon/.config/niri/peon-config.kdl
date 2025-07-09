@@ -1,3 +1,7 @@
+// Generated Niri configuration for PEON
+// Built on: Wed Jul  9 11:01:20 AM CEST 2025
+// Active GPU: nvidia
+
 // Base Niri configuration shared between all machines
 // This config is in the KDL format: https://kdl.dev
 // "/-" comments out the following node.
@@ -213,7 +217,13 @@ layout {
 
 // Environment variables are generated from environment.d/ files
 // This placeholder will be replaced by the build script with the actual environment block
-// BUILD_SCRIPT_ENVIRONMENT_BLOCK_PLACEHOLDER
+// Environment variables generated from environment.d/ files
+environment {
+    DISPLAY ":0"
+    XDG_CURRENT_DESKTOP "niri"
+    GNOME_KEYRING_CONTROL "/run/user/1000/keyring"
+    GTK_THEME "Adwaita:dark"
+}
 
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-desktop-autostart,
@@ -672,4 +682,29 @@ layer-rule {
         spread 8
         color "#00000080"
     }
+}
+
+// GPU-specific output configuration
+// NVIDIA GPU Display Configuration for PEON
+// This file contains output configuration for NVIDIA GPU mode
+// DisplayPort output connected to NVIDIA RTX 3060
+
+// Configure NVIDIA GPU output (DisplayPort)
+output "DP-2" {
+    // Resolution and refresh rate
+    mode "3840x2160@144.050"
+
+    // Scale for HiDPI
+    scale 2
+
+    // Transform allows to rotate the output counter-clockwise
+    transform "normal"
+
+    // Position in global coordinate space
+    position x=0 y=0
+}
+
+// Disable Intel GPU output (HDMI) when using NVIDIA
+output "HDMI-A-2" {
+    off
 }

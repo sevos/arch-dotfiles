@@ -1,0 +1,2 @@
+# Ignore generated files that shouldn't be stowed
+\.config/niri/tuxedo-config\.kdl
