@@ -5,3 +5,4 @@ nvidia-settings
 steam
 ttf-liberation
 nvidia-container-toolkit
+docker-buildx
