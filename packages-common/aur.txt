@@ -11,3 +11,6 @@ ydotool
 waystt-bin
 gearlever
 pinta
+google-cloud-cli
+k9s
+google-cloud-cli-gke-gcloud-auth-plugin
