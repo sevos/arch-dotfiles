@@ -103,3 +103,4 @@ noto-fonts-cjk
 noto-fonts-emoji
 kubectl
 bind
+discord
