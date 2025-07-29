@@ -1,17 +1,5 @@
 # Development Guidelines for Claude
 
-## Language-Specific Context Loading
-
-**CRITICAL**: Before working with any code files, Claude MUST load language-specific development guidelines.
-
-### Available Language Documentation
-
-Currently available in `~/.claude/docs/developer/`:
-
-- **TYPESCRIPT.md** - TypeScript/JavaScript (.ts, .tsx, .js, .jsx files)
-
-Load the appropriate language context using the Read tool before making any code changes.
-
 ## Core Philosophy
 
 **TEST-DRIVEN DEVELOPMENT IS NON-NEGOTIABLE.** Every single line of production code must be written in response to a failing test. No exceptions. This is not a suggestion or a preference - it is the fundamental practice that enables all other principles in this document.
@@ -27,14 +15,12 @@ I follow Test-Driven Development (TDD) with a strong emphasis on behavior-driven
 - Immutable data structures only
 - Small, pure functions with single responsibilities
 - 100% test coverage through business behavior
-- Use real schemas/types in tests, never redefine them
 
 **Code Quality:**
 
 - Self-documenting code without comments
 - Early returns over nested conditionals
 - Composition over complex abstractions
-- Domain-specific types for safety
 
 ## Testing Principles
 
@@ -63,7 +49,6 @@ src/
 Use factory functions with optional overrides for test data:
 
 ```
-// Language-specific implementations in ~/.claude/docs/developer/[LANGUAGE].md
 const getMockEntity = (overrides?) => {
   return {
     // Complete object with sensible defaults
@@ -81,16 +66,6 @@ Key principles:
 - Compose factories for complex objects
 - Use real schemas/types from the project, never redefine in tests
 
-## Language-Specific Type Safety
-
-Type safety implementation varies by language. See language-specific documentation in `~/.claude/docs/developer/` for:
-
-- Static type checking requirements
-- Domain-specific type creation patterns
-- Schema-first development approaches
-- Runtime validation strategies
-- Language-specific type utilities
-
 ## Code Style
 
 ### Functional Programming
@@ -101,7 +76,6 @@ I follow a "functional light" approach:
 - **Pure functions** wherever possible
 - **Composition** as the primary mechanism for code reuse
 - Avoid heavy FP abstractions (no need for complex monads or pipe/compose patterns) unless there is a clear advantage to using them
-- Use language-appropriate iteration methods over imperative loops
 
 #### Universal Functional Patterns
 
@@ -130,8 +104,6 @@ const processOrder = (order) => {
 };
 ```
 
-For language-specific error handling patterns and type implementations, see `~/.claude/docs/developer/[LANGUAGE].md`.
-
 ### Code Structure
 
 - **No nested if/else statements** - use early returns, guard clauses, or composition
@@ -144,9 +116,6 @@ For language-specific error handling patterns and type implementations, see `~/.
 **Universal patterns:**
 - **Functions**: verb-based, descriptive names (e.g., `calculateTotal`, `validatePayment`)
 - **Constants**: `UPPER_SNAKE_CASE` for true constants
-- **Test files**: Follow language conventions (see language-specific docs)
-
-**Language-specific casing and file naming conventions are defined in `~/.claude/docs/developer/[LANGUAGE].md`**
 
 ### No Comments in Code
 
@@ -180,8 +149,6 @@ const calculateDiscount = (price, customer) => {
   return price * discountMultiplier;
 };
 ```
-
-**Exception**: Language-specific documentation comments for public APIs are acceptable when generating documentation, but the code should still be self-explanatory without them.
 
 ## Development Workflow
 
@@ -248,8 +215,6 @@ const processOrder = (order) => {
   return { ...order, shippingCost, total: itemsTotal + shippingCost };
 };
 ```
-
-For language-specific testing syntax and implementation details, see `~/.claude/docs/developer/[LANGUAGE].md`.
 
 ### Refactoring - The Critical Third Step
 
@@ -329,7 +294,7 @@ Refactoring must never break existing consumers of your code.
 **CRITICAL**: After every refactoring:
 
 1. Run all tests - they must pass without modification
-2. Run static analysis (linting, type checking) - must pass
+2. Run static analysis and quality checks - must pass
 3. Commit the refactoring separately from feature changes
 
 #### Refactoring Checklist
@@ -338,7 +303,7 @@ Before considering refactoring complete, verify:
 
 - [ ] The refactoring actually improves the code (if not, don't refactor)
 - [ ] All tests still pass without modification
-- [ ] All static analysis tools pass (linting, type checking)
+- [ ] All static analysis and quality checks pass
 - [ ] No new public APIs were added (only internal ones)
 - [ ] Code is more readable than before
 - [ ] Any duplication removed was duplication of knowledge, not just code
@@ -380,7 +345,7 @@ const calculateOrderTotal = (order) => {
   return itemsTotal + shipping;
 };
 
-// Run tests, linting, type checking - all pass!
+// Run tests and quality checks - all pass!
 // git commit -m "refactor: extract calculation helpers"
 ```
 
@@ -435,30 +400,27 @@ const applyDiscount = (price, discountRate) => {
 
 ### Critical Instructions
 
-1. **LOAD LANGUAGE CONTEXT FIRST** - Before making any code changes, read the appropriate language-specific guidelines from `~/.claude/docs/developer/[LANGUAGE].md`
-2. **ALWAYS FOLLOW TDD** - No production code without a failing test. This is not negotiable.
-3. **Think deeply** before making any edits
-4. **Understand the full context** of the code and requirements
-5. **Ask clarifying questions** when requirements are ambiguous
-6. **Think from first principles** - don't make assumptions
-7. **Assess refactoring after every green** - Look for opportunities to improve code structure, but only refactor if it adds value
-8. **Keep project docs current** - update them whenever you introduce meaningful changes
+1. **ALWAYS FOLLOW TDD** - No production code without a failing test. This is not negotiable.
+2. **Think deeply** before making any edits
+3. **Understand the full context** of the code and requirements
+4. **Ask clarifying questions** when requirements are ambiguous
+5. **Think from first principles** - don't make assumptions
+6. **Assess refactoring after every green** - Look for opportunities to improve code structure, but only refactor if it adds value
+7. **Keep project docs current** - update them whenever you introduce meaningful changes
 
 ### Code Changes Process
 
-1. **Detect file extensions** being modified
-2. **Load appropriate language context** from `~/.claude/docs/developer/[LANGUAGE].md`
-3. **Start with a failing test** - always. No exceptions.
-4. **Write minimal code** to make test pass
-5. **Assess refactoring opportunities** (but only refactor if it adds value)
-6. **Verify all tests and quality checks pass**
-7. **Commit changes**
+1. **Start with a failing test** - always. No exceptions.
+2. **Write minimal code** to make test pass
+3. **Assess refactoring opportunities** (but only refactor if it adds value)
+4. **Verify all tests and quality checks pass**
+5. **Commit changes**
 
 Key principles:
 - Respect existing patterns and conventions
 - Maintain test coverage for all behavior changes
 - Keep changes small and incremental
-- Follow language-specific requirements (types, linting, etc.)
+- Follow established code quality standards
 - Provide rationale for significant design decisions
 
 **If you find yourself writing production code without a failing test, STOP immediately and write the test first.**
@@ -500,8 +462,6 @@ const processPayment = (payment) => {
   return executePayment(payment);
 };
 ```
-
-For language-specific error handling patterns and type systems, see `~/.claude/docs/developer/[LANGUAGE].md`.
 
 ## Testing Behavior Examples
 
@@ -571,8 +531,6 @@ describe("Payment processing", () => {
 });
 ```
 
-For language-specific testing syntax and framework usage, see `~/.claude/docs/developer/[LANGUAGE].md`.
-
 ## Universal Anti-patterns to Avoid
 
 ```
@@ -616,17 +574,6 @@ const processOrder = (order) => {
 };
 ```
 
-For language-specific implementations and syntax, see `~/.claude/docs/developer/[LANGUAGE].md`.
-
-## Language-Specific Resources
-
-See `~/.claude/docs/developer/[LANGUAGE].md` for:
-- Language-specific documentation links
-- Framework and library references
-- Testing tool documentation
-- Community best practices
-- Official language guides
-
 ## Mermaid Diagrams
 
 When explaining architecture, topology, workflows, or any structural/process concepts, leverage Mermaid diagrams for visual clarity.
@@ -665,4 +612,4 @@ Choose based on program behavior: immediate completion → Bash, persistent/inte
 
 The key is to write clean, testable, functional code that evolves through small, safe increments. Every change should be driven by a test that describes the desired behavior, and the implementation should be the simplest thing that makes that test pass.
 
-**Remember**: Always load language-specific context from `~/.claude/docs/developer/[LANGUAGE].md` before working with code files. When in doubt, favor simplicity and readability over cleverness.
+When in doubt, favor simplicity and readability over cleverness.
