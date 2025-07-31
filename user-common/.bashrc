@@ -93,3 +93,7 @@ if command -v fzf >/dev/null 2>&1; then
     # Bind Alt+C for directory search
     bind -x '"\ec": fzf-cd-widget'
 fi
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/sevos/.lmstudio/bin"
+# End of LM Studio CLI section
+

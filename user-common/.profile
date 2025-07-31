@@ -29,3 +29,8 @@ export EDITOR=nano
 export VISUAL=nano
 # ydotool socket configuration
 export YDOTOOL_SOCKET="/run/user/1000/.ydotool_socket"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/sevos/.lmstudio/bin"
+# End of LM Studio CLI section
+
