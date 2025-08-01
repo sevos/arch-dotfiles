@@ -6,4 +6,4 @@ steam
 ttf-liberation
 nvidia-container-toolkit
 docker-buildx
-ollama-cuda
+cuda
