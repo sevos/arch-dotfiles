@@ -30,6 +30,8 @@ GNU Stow-based dotfiles management for Arch Linux systems with multi-machine sup
 ├── system-{common,hostname}/       # System configs (stow to `/`)
 │   └── post-install.d/            # System post-install scripts
 ├── user-{common,hostname}/         # User configs (stow to `~`)
+│   ├── .claude/                   # Claude Code configuration
+│   │   └── awesome-claude-agent/  # Specialized AI agents (git subtree)
 │   └── post-install.d/            # User post-install scripts
 ├── lib/                           # Shared libraries
 │   └── logging.sh                 # Logging and progress tracking
@@ -186,9 +188,19 @@ When implementing configuration changes, **always clarify the target scope**:
    - "Should I add this package to the current machine only or to all machines?"
    - "Do you want this configuration applied system-wide (common) or just for this machine?"
 
+## Dependencies
+
+### Claude Code AI Agents
+- **Location**: `user-common/.claude/awesome-claude-agent/` (git subtree)
+- **Source**: https://github.com/vijaythecoder/awesome-claude-agents
+- **Management**: Use `git subtree pull --squash` to update without history pollution
+- **Purpose**: 24+ specialized AI agents for Claude Code development workflows
+- **Update Command**: `git subtree pull --prefix=user-common/.claude/awesome-claude-agent --squash https://github.com/vijaythecoder/awesome-claude-agents.git main`
+
 ## Memory Notes
 - Check `/etc/hostname` for hostname detection
 - Use `cat /etc/hostname` to determine hostname when `hostname` command is not available
 - Repository is at `~/.dotfiles` (user home, not `/root/dotfiles`)
 - Scripts use shared logging from `lib/logging.sh`
 - Always confirm target scope (common vs machine-specific) before implementing changes
+- Claude AI agents managed as git subtree to avoid submodule complexity
