@@ -8,3 +8,4 @@ nvidia-container-toolkit
 docker-buildx
 cuda
 cudnn
+nccl
