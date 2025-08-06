@@ -7,3 +7,4 @@ ttf-liberation
 nvidia-container-toolkit
 docker-buildx
 cuda
+cudnn
