@@ -33,39 +33,6 @@ I follow Test-Driven Development (TDD) with a strong emphasis on behavior-driven
 - **Coverage targets**: 100% coverage should be expected at all times, but these tests must ALWAYS be based on business behaviour, not implementation details
 - Tests must document expected business behaviour
 
-### Test Organization Pattern
-
-```
-src/
-  features/
-    payment/
-      payment-processor.[ext]
-      payment-validator.[ext]
-      payment-processor.test.[ext] // Validator is implementation detail, covered through behavior
-```
-
-### Test Data Pattern
-
-Use factory functions with optional overrides for test data:
-
-```
-const getMockEntity = (overrides?) => {
-  return {
-    // Complete object with sensible defaults
-    ...baseDefaults,
-    ...overrides,
-  };
-};
-```
-
-Key principles:
-
-- Always return complete objects with sensible defaults
-- Accept optional overrides parameter
-- Build incrementally - extract nested object factories as needed
-- Compose factories for complex objects
-- Use real schemas/types from the project, never redefine in tests
-
 ## Code Style
 
 ### Functional Programming
