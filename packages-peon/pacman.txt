@@ -9,3 +9,4 @@ docker-buildx
 cuda
 cudnn
 nccl
+wine
