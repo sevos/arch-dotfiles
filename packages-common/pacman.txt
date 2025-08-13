@@ -104,3 +104,10 @@ noto-fonts-emoji
 kubectl
 bind
 discord
+gst-plugin-pipewire
+gst-plugins-bad
+pipewire-alsa
+pipewire-jack
+tree
+zip
+unzip

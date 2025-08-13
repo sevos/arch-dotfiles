@@ -1,2 +1,3 @@
-lmstudio-beta
+lmstudio
 cusparselt
+google-cloud-cli-gke-gcloud-auth-plugin

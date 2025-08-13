@@ -1,0 +1,14 @@
+[Unit]
+Description=Fix dual network routing for smart home access
+After=network-online.target iwd.service systemd-networkd.service
+Wants=network-online.target
+PartOf=systemd-networkd.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'sleep 3; ip route del default via 192.168.1.1 dev wlan0 2>/dev/null || true; logger "fix-routing: WiFi default route cleanup completed"'
+RemainAfterExit=yes
+TimeoutStartSec=30
+
+[Install]
+WantedBy=multi-user.target

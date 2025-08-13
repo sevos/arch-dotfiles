@@ -10,3 +10,5 @@ cuda
 cudnn
 nccl
 wine
+nvtop
+wl-mirror
