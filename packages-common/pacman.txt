@@ -111,3 +111,4 @@ pipewire-jack
 tree
 zip
 unzip
+python-playwright
