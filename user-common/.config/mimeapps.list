@@ -29,6 +29,7 @@ video/x-ms-wmv=celluloid.desktop
 video/x-flv=celluloid.desktop
 video/3gpp=celluloid.desktop
 video/ogg=celluloid.desktop
+application/x-zerosize=com.google.Chrome.desktop
 
 [Added Associations]
 text/plain=code.desktop;
@@ -61,4 +62,5 @@ application/json=code.desktop;
 text/markdown=code.desktop;
 text/x-yaml=code.desktop;
 application/x-yaml=code.desktop;
-application/pdf=com.google.Chrome.desktop;
+application/pdf=com.github.xournalpp.xournalpp.desktop;com.google.Chrome.desktop;
+application/x-zerosize=com.google.Chrome.desktop;
