@@ -62,5 +62,5 @@ application/json=code.desktop;
 text/markdown=code.desktop;
 text/x-yaml=code.desktop;
 application/x-yaml=code.desktop;
-application/pdf=com.github.xournalpp.xournalpp.desktop;com.google.Chrome.desktop;
+application/pdf=com.google.Chrome.desktop;com.github.xournalpp.xournalpp.desktop;
 application/x-zerosize=com.google.Chrome.desktop;
